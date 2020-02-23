@@ -5,8 +5,8 @@
   "main": "out/index.js",
   "types": "out/index.d.ts",
   "scripts": {
-    "build": "tsc --project ./tsconfig.json && cp ./src/*.css ./out",
-    "preversion": "npm run build && git add ./out/** && git commit -m Build",
+    "build": "rm -rf out && tsc --project ./tsconfig.json && cp ./src/*.css ./out",
+    "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build",
     "postversion": "git push --tags origin"
   },
   "repository": {
