@@ -5,6 +5,8 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Playbook_1 = require("./Playbook");
 exports.Playbook = Playbook_1.default;
+exports.getReactChildren = Playbook_1.getReactChildren;
 var flattenObject_1 = require("./flattenObject");
 exports.flattenObject = flattenObject_1.default;
 __export(require("./StorybookAdapter"));
+__export(require("./ParcelAdapter"));

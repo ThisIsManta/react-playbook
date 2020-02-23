@@ -12,6 +12,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -60,6 +71,9 @@ function classNames() {
     }
     return lodash_1.default.compact(classes).join(' ');
 }
+exports.default = (function (props) { return (react_1.default.createElement(ErrorBoundary, null,
+    react_1.default.createElement(react_router_dom_1.BrowserRouter, null,
+        react_1.default.createElement(Playbook, __assign({}, props))))); });
 function Playbook(props) {
     var location = react_router_dom_1.useLocation();
     var _a = __read(react_1.useState(window.sessionStorage.getItem('playbook__searchText') || ''), 2), searchText = _a[0], setSearchText = _a[1];
@@ -83,7 +97,7 @@ function Playbook(props) {
         : react_1.default.createElement("span", { key: rank },
             part,
             "/")); }))); }); }, [pages, location.pathname, searchPatterns]);
-    var contents = react_1.useMemo(function () { return (react_1.default.createElement(react_router_dom_1.Switch, null, pages.map(function (page) { return (react_1.default.createElement(react_router_dom_1.Route, { key: page.name, path: '/' + window.encodeURI(page.name) }, function () { return react_1.default.createElement(Content, null, page.content); })); }))); }, [pages]);
+    var contents = react_1.useMemo(function () { return (react_1.default.createElement(react_router_dom_1.Switch, null, pages.map(function (page) { return (react_1.default.createElement(react_router_dom_1.Route, { key: page.name, path: '/' + window.encodeURI(page.name) }, function () { return react_1.default.createElement(Content, { page: page }); })); }))); }, [pages]);
     return (react_1.default.createElement("div", { className: 'playbook' },
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&display=swap', rel: 'stylesheet' }),
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto+Mono:400,600&display=swap', rel: 'stylesheet' }),
@@ -100,11 +114,13 @@ function Playbook(props) {
             react_1.default.createElement("div", { className: 'playbook__toolbar' }, props.toolbar),
             react_1.default.createElement("div", { className: 'playbook__contents' }, contents))));
 }
-exports.default = Playbook;
 function Content(props) {
-    var elements = getChildren(props.children);
+    var elements = getReactChildren(props.page.content);
     if (elements.length === 0) {
-        return react_1.default.createElement("div", null, "No valid React elements found.");
+        return (react_1.default.createElement("div", { className: 'playbook__error' },
+            "Expected to render React elements, but found ",
+            JSON.stringify(props.page.content),
+            "."));
     }
     return (react_1.default.createElement(react_1.default.Fragment, null, elements.map(function (element, index) {
         var _a;
@@ -114,7 +130,7 @@ function Content(props) {
             react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } })));
     })));
 }
-function getChildren(element) {
+function getReactChildren(element) {
     if (lodash_1.default.isArray(element)) {
         return Δ(element);
     }
@@ -132,6 +148,7 @@ function getChildren(element) {
     }
     return [];
 }
+exports.getReactChildren = getReactChildren;
 function Δ(elements) {
     return elements.filter(react_1.default.isValidElement);
 }

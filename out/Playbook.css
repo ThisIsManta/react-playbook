@@ -131,7 +131,7 @@ body {
 .playbook__preview {
   position: relative;
   flex: 1;
-  padding: 20px 0;
+  padding: 20px;
   overflow-x: auto;
 }
 
@@ -141,7 +141,10 @@ body {
 }
 
 .playbook__error {
-  color: red;
+  display: inline-block;
+  background: #ffebee;
+  color: #f44336;
+  padding: 10px;
   font-family: Roboto, sans-serif;
   font-size: 14px;
 }

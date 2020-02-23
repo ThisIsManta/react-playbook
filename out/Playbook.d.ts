@@ -3,7 +3,10 @@ export interface IPlaybookPage {
     name: string;
     content: React.ReactFragment;
 }
-export default function Playbook(props: {
+declare type Props = {
     toolbar?: React.ReactNode;
     pages: Array<IPlaybookPage>;
-}): JSX.Element;
+};
+declare const _default: (props: Props) => JSX.Element;
+export default _default;
+export declare function getReactChildren(element: React.ReactFragment): Array<React.ReactElement>;
