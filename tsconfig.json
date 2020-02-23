@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "target": "es5",
+    "outDir": "out",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "pretty": true,
+    "skipLibCheck": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "downlevelIteration": true,
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "removeComments": true,
+    "declaration": true,
+    "sourceMap": false
+  },
+  "include": [
+    "src"
+  ]
+}
