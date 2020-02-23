@@ -2,13 +2,18 @@ import React, { useState, useMemo, useCallback } from 'react'
 import { Switch, Route, Link, useLocation } from 'react-router-dom'
 import _ from 'lodash'
 
+function classNames(...classes: Array<any>) {
+	return _.compact(classes).join(' ')
+}
+
 export interface IPlaybookPage {
 	name: string
 	content: React.ReactFragment
 }
 
-function classNames(...classes: Array<any>) {
-	return _.compact(classes).join(' ')
+type Props = {
+	toolbar?: React.ReactNode
+	pages: Array<IPlaybookPage>
 }
 
 export default function Playbook(props: {
@@ -69,7 +74,7 @@ export default function Playbook(props: {
 						key={page.name}
 						path={'/' + window.encodeURI(page.name)}
 					>
-						{() => <Content>{page.content}</Content>}
+						{() => <Content page={page} />}
 					</Route>
 				))}
 			</Switch>
@@ -112,8 +117,8 @@ export default function Playbook(props: {
 	)
 }
 
-function Content(props: { children: React.ReactFragment }) {
-	const elements = getChildren(props.children)
+function Content(props: { page: Pick<IPlaybookPage, 'content'> }) {
+	const elements = getReactChildren(props.page.content)
 
 	if (elements.length === 0) {
 		return <div>No valid React elements found.</div>
@@ -135,7 +140,7 @@ function Content(props: { children: React.ReactFragment }) {
 	)
 }
 
-function getChildren(element: React.ReactFragment): Array<React.ReactElement> {
+export function getReactChildren(element: React.ReactFragment): Array<React.ReactElement> {
 	if (_.isArray(element)) {
 		return Δ(element)
 	}
