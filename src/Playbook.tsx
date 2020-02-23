@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { Switch, Route, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link, useLocation } from 'react-router-dom'
 import _ from 'lodash'
 
 function classNames(...classes: Array<any>) {
@@ -16,10 +16,15 @@ type Props = {
 	pages: Array<IPlaybookPage>
 }
 
-export default function Playbook(props: {
-	toolbar?: React.ReactNode
-	pages: Array<IPlaybookPage>
-}) {
+export default (props: Props) => (
+	<ErrorBoundary>
+		<BrowserRouter>
+			<Playbook {...props} />
+		</BrowserRouter>
+	</ErrorBoundary>
+)
+
+function Playbook(props: Props) {
 	const location = useLocation()
 
 	const [searchText, setSearchText] = useState(window.sessionStorage.getItem('playbook__searchText') || '')
@@ -121,7 +126,11 @@ function Content(props: { page: Pick<IPlaybookPage, 'content'> }) {
 	const elements = getReactChildren(props.page.content)
 
 	if (elements.length === 0) {
-		return <div>No valid React elements found.</div>
+		return (
+			<div className='playbook__error'>
+				Expected to render React elements, but found {JSON.stringify(props.page.content)}.
+			</div>
+		)
 	}
 
 	return (
