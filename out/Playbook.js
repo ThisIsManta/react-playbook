@@ -62,7 +62,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
-var react_router_dom_1 = require("react-router-dom");
 var lodash_1 = __importDefault(require("lodash"));
 function classNames() {
     var classes = [];
@@ -72,11 +71,10 @@ function classNames() {
     return lodash_1.default.compact(classes).join(' ');
 }
 exports.default = (function (props) { return (react_1.default.createElement(ErrorBoundary, null,
-    react_1.default.createElement(react_router_dom_1.BrowserRouter, null,
-        react_1.default.createElement(Playbook, __assign({}, props))))); });
+    react_1.default.createElement(Playbook, __assign({}, props)))); });
 function Playbook(props) {
-    var location = react_router_dom_1.useLocation();
-    var _a = __read(react_1.useState(window.sessionStorage.getItem('playbook__searchText') || ''), 2), searchText = _a[0], setSearchText = _a[1];
+    var _a = __read(react_1.useState(null), 2), selectPage = _a[0], setSelectPage = _a[1];
+    var _b = __read(react_1.useState(window.sessionStorage.getItem('playbook__searchText') || ''), 2), searchText = _b[0], setSearchText = _b[1];
     var onSearchBoxChange = react_1.useCallback(function (value) {
         setSearchText(value);
         window.sessionStorage.setItem('playbook__searchText', value);
@@ -89,15 +87,15 @@ function Playbook(props) {
         .value(); }, [props.pages]);
     var menus = react_1.useMemo(function () { return pages
         .filter(function (page) { return searchPatterns.length === 0 || searchPatterns.every(function (pattern) { return pattern.test(page.name); }); })
-        .map(function (page) { return (react_1.default.createElement(react_router_dom_1.Link, { key: page.name, className: classNames('playbook__menu__item', (location.pathname === '/' + page.name) && '--select'), to: {
-            pathname: '/' + window.encodeURI(page.name),
-            search: location.search,
+        .map(function (page) { return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', (location.pathname === '/' + page.name) && '--select'), href: '/' + window.encodeURI(page.name), onClick: function (e) {
+            e.preventDefault();
+            setSelectPage(page);
+            history.pushState(null, '', '/' + window.encodeURI(page.name));
         } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
         ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
         : react_1.default.createElement("span", { key: rank },
             part,
             "/")); }))); }); }, [pages, location.pathname, searchPatterns]);
-    var contents = react_1.useMemo(function () { return (react_1.default.createElement(react_router_dom_1.Switch, null, pages.map(function (page) { return (react_1.default.createElement(react_router_dom_1.Route, { key: page.name, path: '/' + window.encodeURI(page.name) }, function () { return react_1.default.createElement(Content, { page: page }); })); }))); }, [pages]);
     return (react_1.default.createElement("div", { className: 'playbook' },
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&display=swap', rel: 'stylesheet' }),
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto+Mono:400,600&display=swap', rel: 'stylesheet' }),
@@ -112,7 +110,7 @@ function Playbook(props) {
             react_1.default.createElement("div", { className: 'playbook__menu' }, menus)),
         react_1.default.createElement("div", { className: 'playbook__right' },
             react_1.default.createElement("div", { className: 'playbook__toolbar' }, props.toolbar),
-            react_1.default.createElement("div", { className: 'playbook__contents' }, contents))));
+            react_1.default.createElement("div", { className: 'playbook__contents' }, selectPage && react_1.default.createElement(Content, { page: selectPage })))));
 }
 function Content(props) {
     var elements = getReactChildren(props.page.content);
