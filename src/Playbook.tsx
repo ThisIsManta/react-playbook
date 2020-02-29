@@ -22,7 +22,15 @@ export default (props: Props) => (
 )
 
 function Playbook(props: Props) {
-	const [selectPage, setSelectPage] = useState<IPlaybookPage | null>(null)
+	const pages = useMemo(
+		() => _.chain(props.pages)
+			.uniqBy(page => page.name)
+			.sortBy(page => page.name)
+			.value(),
+		[props.pages],
+	)
+
+	const selectPage = pages.find(page => page.name === window.decodeURI(window.location.pathname.replace(/^\//, '')))
 
 	const [searchText, setSearchText] = useState(window.sessionStorage.getItem('playbook__searchText') || '')
 	const onSearchBoxChange = useCallback((value: string) => {
@@ -35,14 +43,6 @@ function Playbook(props: Props) {
 		[searchText],
 	)
 
-	const pages = useMemo(
-		() => _.chain(props.pages)
-			.uniqBy(page => page.name)
-			.sortBy(page => page.name)
-			.value(),
-		[props.pages],
-	)
-
 	const menus = useMemo(
 		() => pages
 			.filter(page => searchPatterns.length === 0 || searchPatterns.every(pattern => pattern.test(page.name)))
@@ -51,14 +51,9 @@ function Playbook(props: Props) {
 					key={page.name}
 					className={classNames(
 						'playbook__menu__item',
-						(location.pathname === '/' + page.name) && '--select',
+						page === selectPage && '--select',
 					)}
 					href={'/' + window.encodeURI(page.name)}
-					onClick={e => {
-						e.preventDefault()
-						setSelectPage(page)
-						history.pushState(null, '', '/' + window.encodeURI(page.name))
-					}}
 				>
 					{page.name.split('/').map((part, rank, list) => (
 						rank === list.length - 1
