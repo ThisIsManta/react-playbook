@@ -73,25 +73,21 @@ function classNames() {
 exports.default = (function (props) { return (react_1.default.createElement(ErrorBoundary, null,
     react_1.default.createElement(Playbook, __assign({}, props)))); });
 function Playbook(props) {
-    var _a = __read(react_1.useState(null), 2), selectPage = _a[0], setSelectPage = _a[1];
-    var _b = __read(react_1.useState(window.sessionStorage.getItem('playbook__searchText') || ''), 2), searchText = _b[0], setSearchText = _b[1];
+    var pages = react_1.useMemo(function () { return lodash_1.default.chain(props.pages)
+        .uniqBy(function (page) { return page.name; })
+        .sortBy(function (page) { return page.name; })
+        .value(); }, [props.pages]);
+    var selectPage = pages.find(function (page) { return page.name === window.decodeURI(window.location.pathname.replace(/^\//, '')); });
+    var _a = __read(react_1.useState(window.sessionStorage.getItem('playbook__searchText') || ''), 2), searchText = _a[0], setSearchText = _a[1];
     var onSearchBoxChange = react_1.useCallback(function (value) {
         setSearchText(value);
         window.sessionStorage.setItem('playbook__searchText', value);
     }, []);
     var searchPatterns = react_1.useMemo(function () { return lodash_1.default.words(searchText)
         .map(function (word) { return new RegExp(lodash_1.default.escapeRegExp(word), 'i'); }); }, [searchText]);
-    var pages = react_1.useMemo(function () { return lodash_1.default.chain(props.pages)
-        .uniqBy(function (page) { return page.name; })
-        .sortBy(function (page) { return page.name; })
-        .value(); }, [props.pages]);
     var menus = react_1.useMemo(function () { return pages
         .filter(function (page) { return searchPatterns.length === 0 || searchPatterns.every(function (pattern) { return pattern.test(page.name); }); })
-        .map(function (page) { return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', (location.pathname === '/' + page.name) && '--select'), href: '/' + window.encodeURI(page.name), onClick: function (e) {
-            e.preventDefault();
-            setSelectPage(page);
-            history.pushState(null, '', '/' + window.encodeURI(page.name));
-        } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
+        .map(function (page) { return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', page === selectPage && '--select'), href: '/' + window.encodeURI(page.name) }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
         ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
         : react_1.default.createElement("span", { key: rank },
             part,
