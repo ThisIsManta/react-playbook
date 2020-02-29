@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { BrowserRouter, Switch, Route, Link, useLocation } from 'react-router-dom'
 import _ from 'lodash'
 
 function classNames(...classes: Array<any>) {
@@ -18,14 +17,12 @@ type Props = {
 
 export default (props: Props) => (
 	<ErrorBoundary>
-		<BrowserRouter>
-			<Playbook {...props} />
-		</BrowserRouter>
+		<Playbook {...props} />
 	</ErrorBoundary>
 )
 
 function Playbook(props: Props) {
-	const location = useLocation()
+	const [selectPage, setSelectPage] = useState<IPlaybookPage | null>(null)
 
 	const [searchText, setSearchText] = useState(window.sessionStorage.getItem('playbook__searchText') || '')
 	const onSearchBoxChange = useCallback((value: string) => {
@@ -50,15 +47,17 @@ function Playbook(props: Props) {
 		() => pages
 			.filter(page => searchPatterns.length === 0 || searchPatterns.every(pattern => pattern.test(page.name)))
 			.map(page => (
-				<Link
+				<a
 					key={page.name}
 					className={classNames(
 						'playbook__menu__item',
 						(location.pathname === '/' + page.name) && '--select',
 					)}
-					to={{
-						pathname: '/' + window.encodeURI(page.name),
-						search: location.search,
+					href={'/' + window.encodeURI(page.name)}
+					onClick={e => {
+						e.preventDefault()
+						setSelectPage(page)
+						history.pushState(null, '', '/' + window.encodeURI(page.name))
 					}}
 				>
 					{page.name.split('/').map((part, rank, list) => (
@@ -66,25 +65,9 @@ function Playbook(props: Props) {
 							? <span key={rank} className='playbook__menu__item__last'>{part}</span>
 							: <span key={rank}>{part}/</span>
 					))}
-				</Link>
+				</a>
 			)),
 		[pages, location.pathname, searchPatterns],
-	)
-
-	const contents = useMemo(
-		() => (
-			<Switch>
-				{pages.map(page => (
-					<Route
-						key={page.name}
-						path={'/' + window.encodeURI(page.name)}
-					>
-						{() => <Content page={page} />}
-					</Route>
-				))}
-			</Switch>
-		),
-		[pages],
 	)
 
 	return (
@@ -115,7 +98,7 @@ function Playbook(props: Props) {
 					{props.toolbar}
 				</div>
 				<div className='playbook__contents'>
-					{contents}
+					{selectPage && <Content page={selectPage} />}
 				</div>
 			</div>
 		</div>
