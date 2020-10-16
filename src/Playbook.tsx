@@ -15,13 +15,7 @@ type Props = {
 	pages: Array<IPlaybookPage>
 }
 
-export default (props: Props) => (
-	<ErrorBoundary>
-		<Playbook {...props} />
-	</ErrorBoundary>
-)
-
-function Playbook(props: Props) {
+export default React.memo((props: Props) => {
 	const pages = useMemo(
 		() => _.chain(props.pages)
 			.uniqBy(page => page.name)
@@ -30,7 +24,43 @@ function Playbook(props: Props) {
 		[props.pages],
 	)
 
-	const [selectPage, setSelectPage] = useState(pages.find(page => page.name === window.decodeURI(window.location.pathname.replace(/^\//, ''))))
+	const path = window.decodeURI(window.location.pathname.replace(/^\//, ''))
+	if (path !== '') {
+		const page = pages.find(page => page.name === path)
+
+		if (!page) {
+			return null
+		}
+
+		const elements = getReactChildren(page.content)
+
+		if (elements.length === 0) {
+			return null
+		}
+
+		const index = window.location.hash.replace(/^#/, '')
+		const element = elements[index]
+
+		if (!element) {
+			return null
+		}
+
+		return (
+			<ErrorBoundary>
+				{element}
+			</ErrorBoundary>
+		)
+	}
+
+	return (
+		<ErrorBoundary>
+			<Playbook {...props} />
+		</ErrorBoundary>
+	)
+})
+
+function Playbook(props: Props) {
+	const [selectPage, setSelectPage] = useState(() => props.pages.find(page => page.name === getSearchQuery()['p']))
 
 	const [searchText, setSearchText] = useState(window.sessionStorage.getItem('playbook__searchText') || '')
 	const onSearchBoxChange = useCallback((value: string) => {
@@ -44,31 +74,35 @@ function Playbook(props: Props) {
 	)
 
 	const menus = useMemo(
-		() => pages
+		() => props.pages
 			.filter(page => searchPatterns.length === 0 || searchPatterns.every(pattern => pattern.test(page.name)))
-			.map(page => (
-				<a
-					key={page.name}
-					className={classNames(
-						'playbook__menu__item',
-						page === selectPage && '--select',
-					)}
-					href={'/' + window.encodeURI(page.name)}
-					onClick={e => {
-						// Avoid re-rendering the whole page for performance while allow users to copy the links
-						e.preventDefault()
-						window.history.pushState(null, '', '/' + window.encodeURI(page.name))
-						setSelectPage(page)
-					}}
-				>
-					{page.name.split('/').map((part, rank, list) => (
-						rank === list.length - 1
-							? <span key={rank} className='playbook__menu__item__last'>{part}</span>
-							: <span key={rank}>{part}/</span>
-					))}
-				</a>
-			)),
-		[pages, location.pathname, searchPatterns],
+			.map(page => {
+				const link = '?p=' + window.encodeURI(page.name)
+
+				return (
+					<a
+						key={page.name}
+						className={classNames(
+							'playbook__menu__item',
+							page === selectPage && '--select',
+						)}
+						href={link}
+						onClick={e => {
+							// Avoid re-rendering the whole page for performance while allow users to copy the links
+							e.preventDefault()
+							window.history.pushState(null, '', link)
+							setSelectPage(page)
+						}}
+					>
+						{page.name.split('/').map((part, rank, list) => (
+							rank === list.length - 1
+								? <span key={rank} className='playbook__menu__item__last'>{part}</span>
+								: <span key={rank}>{part}/</span>
+						))}
+					</a>
+				)
+			}),
+		[props.pages, selectPage, searchPatterns],
 	)
 
 	return (
@@ -98,14 +132,14 @@ function Playbook(props: Props) {
 					{props.toolbar}
 				</div>
 				<div className='playbook__contents'>
-					{selectPage && <Content page={selectPage} />}
+					{selectPage && <Contents page={selectPage} />}
 				</div>
 			</div>
 		</div>
 	)
 }
 
-function Content(props: { page: Pick<IPlaybookPage, 'content'> }) {
+function Contents(props: { page: IPlaybookPage }) {
 	const elements = getReactChildren(props.page.content)
 
 	if (elements.length === 0) {
@@ -119,12 +153,19 @@ function Content(props: { page: Pick<IPlaybookPage, 'content'> }) {
 	return (
 		<React.Fragment>
 			{elements.map((element, index) => (
-				<section key={element.key ?? index} className='playbook__content'>
-					<div className='playbook__preview'>
-						<ErrorBoundary>
-							{element}
-						</ErrorBoundary>
-					</div>
+				<section key={props.page.name + '#' + index} className='playbook__content'>
+					<iframe
+						className='playbook__preview'
+						src={'/' + window.encodeURI(props.page.name) + '#' + index}
+						width='100%'
+						frameBorder='0'
+						scrolling='no'
+						onLoad={(e) => {
+							if (e.currentTarget.contentWindow) {
+								e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
+							}
+						}}
+					/>
 					<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
 				</section>
 			))}
@@ -332,4 +373,15 @@ class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, {
 
 		return this.props.children
 	}
+}
+
+function getSearchQuery(): { [key: string]: string } {
+	return _.chain(window.location.search.replace(/^\?/, ''))
+		.split('&')
+		.map(part => {
+			const [key, value] = part.split('=')
+			return [key, window.decodeURIComponent(value) ?? '']
+		})
+		.fromPairs()
+		.value()
 }
