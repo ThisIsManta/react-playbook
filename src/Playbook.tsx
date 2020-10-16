@@ -30,7 +30,7 @@ function Playbook(props: Props) {
 		[props.pages],
 	)
 
-	const selectPage = pages.find(page => page.name === window.decodeURI(window.location.pathname.replace(/^\//, '')))
+	const [selectPage, setSelectPage] = useState(pages.find(page => page.name === window.decodeURI(window.location.pathname.replace(/^\//, ''))))
 
 	const [searchText, setSearchText] = useState(window.sessionStorage.getItem('playbook__searchText') || '')
 	const onSearchBoxChange = useCallback((value: string) => {
@@ -54,6 +54,12 @@ function Playbook(props: Props) {
 						page === selectPage && '--select',
 					)}
 					href={'/' + window.encodeURI(page.name)}
+					onClick={e => {
+						// Avoid re-rendering the whole page for performance while allow users to copy the links
+						e.preventDefault()
+						window.history.pushState(null, '', '/' + window.encodeURI(page.name))
+						setSelectPage(page)
+					}}
 				>
 					{page.name.split('/').map((part, rank, list) => (
 						rank === list.length - 1
