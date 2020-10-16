@@ -67,8 +67,7 @@ function Playbook(props: Props) {
 
 	return (
 		<div className='playbook'>
-			<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&display=swap' rel='stylesheet' />
-			<link href='https://fonts.googleapis.com/css?family=Roboto+Mono:400,600&display=swap' rel='stylesheet' />
+			<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&family=Roboto+Mono:400,600&display=swap' rel='stylesheet' />
 			<div className='playbook__left'>
 				<input
 					className='playbook__search-box'

@@ -5,6 +5,7 @@
   "main": "out/index.js",
   "types": "out/index.d.ts",
   "scripts": {
+    "start": "parcel ./src/demo.html --out-dir tmp --open",
     "build": "rm -rf out && tsc --project ./tsconfig.json && cp ./src/*.css ./out",
     "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build",
     "postversion": "git push --tags origin"
@@ -27,15 +28,17 @@
   },
   "homepage": "https://github.com/ThisIsManta/react-playbook#readme",
   "devDependencies": {
-    "@types/lodash": "^4.14.149",
-    "@types/react": "^16.9.19",
-    "@types/react-dom": "^16.9.5",
-    "lodash": "^4.17.0",
-    "react": "^16.12.0",
+    "@types/lodash": "^4.14.162",
+    "@types/react": "^16.9.52",
+    "@types/react-dom": "^16.9.8",
+    "lodash": "^4.17.20",
+    "parcel-bundler": "^1.12.4",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "typescript": "^3.7.5"
   },
   "peerDependencies": {
     "lodash": "^4.17.0",
-    "react": "^16.12.0"
+    "react": "^16.13.0"
   }
 }
