@@ -129,10 +129,8 @@ body {
 }
 
 .playbook__preview {
-  position: relative;
-  flex: 1;
+  /* flex: 1; */
   padding: 20px;
-  overflow-x: auto;
 }
 
 .playbook__content:last-child {
