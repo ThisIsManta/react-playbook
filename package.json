@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/ThisIsManta/react-playbook#readme",
   "devDependencies": {
+    "@types/fuzzy-search": "^2.1.0",
     "@types/lodash": "^4.14.162",
     "@types/react": "^16.9.52",
     "@types/react-dom": "^16.9.8",
@@ -40,5 +41,8 @@
   "peerDependencies": {
     "lodash": "^4.17.0",
     "react": "^16.13.0"
+  },
+  "dependencies": {
+    "fuzzy-search": "^3.2.1"
   }
 }

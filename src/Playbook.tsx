@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import _ from 'lodash'
+import FuzzySearch from 'fuzzy-search'
 
 function classNames(...classes: Array<any>) {
 	return _.compact(classes).join(' ')
@@ -72,41 +73,34 @@ function Playbook(props: Props) {
 		setQueryParams({ q: searchText }, true)
 	}, [searchText])
 
-	const searchPatterns = useMemo(
-		() => _.words(searchText)
-			.map(word => new RegExp(_.escapeRegExp(word), 'i')),
-		[searchText],
+	const searcher = useMemo(
+		() => new FuzzySearch(props.pages, ['name'], { caseSensitive: false, sort: true }),
+		[props.pages],
 	)
 
 	const menus = useMemo(
-		() => props.pages
-			.filter(page => searchPatterns.length === 0 || searchPatterns.every(pattern => pattern.test(page.name)))
-			.map(page => {
-				const link = '?p=' + window.encodeURI(page.name)
-
-				return (
-					<a
-						key={page.name}
-						className={classNames(
-							'playbook__menu__item',
-							page === selectPage && '--select',
-						)}
-						href={link}
-						onClick={e => {
-							// Avoid re-rendering the whole page for performance while allow users to copy the links
-							e.preventDefault()
-							setSelectPage(page)
-						}}
-					>
-						{page.name.split('/').map((part, rank, list) => (
-							rank === list.length - 1
-								? <span key={rank} className='playbook__menu__item__last'>{part}</span>
-								: <span key={rank}>{part}/</span>
-						))}
-					</a>
-				)
-			}),
-		[props.pages, selectPage, searchPatterns],
+		() => searcher.search(searchText).map(page => (
+			<a
+				key={page.name}
+				className={classNames(
+					'playbook__menu__item',
+					page === selectPage && '--select',
+				)}
+				href={'?p=' + window.encodeURI(page.name)}
+				onClick={e => {
+					// Avoid re-rendering the whole page for performance while allow users to copy the links
+					e.preventDefault()
+					setSelectPage(page)
+				}}
+			>
+				{page.name.split('/').map((part, rank, list) => (
+					rank === list.length - 1
+						? <span key={rank} className='playbook__menu__item__last'>{part}</span>
+						: <span key={rank}>{part}/</span>
+				))}
+			</a>
+		)),
+		[searcher, searchText, selectPage],
 	)
 
 	return (
