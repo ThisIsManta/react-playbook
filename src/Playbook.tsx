@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import _ from 'lodash'
 import FuzzySearch from 'fuzzy-search'
 
@@ -61,13 +61,18 @@ export default React.memo((props: Props) => {
 })
 
 function Playbook(props: Props) {
-	const [selectPage, setSelectPage] = useState(() => props.pages.find(page => page.name === getQueryParams()['p']))
+	const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages])
+	const getSearchText = useCallback(() => getQueryParams()['q'] || '', [])
+
+	const [selectPage, setSelectPage] = useState(getSelectPage)
+	const [searchText, setSearchText] = useState(getSearchText)
 
 	useEffect(() => {
-		setQueryParams({ p: selectPage?.name }, false)
-	}, [selectPage])
-
-	const [searchText, setSearchText] = useState(() => getQueryParams()['q'] || '')
+		window.addEventListener('popstate', () => {
+			setSelectPage(getSelectPage())
+			setSearchText(getSearchText())
+		})
+	}, [])
 
 	useEffect(() => {
 		setQueryParams({ q: searchText }, true)
@@ -91,6 +96,7 @@ function Playbook(props: Props) {
 					// Avoid re-rendering the whole page for performance while allow users to copy the links
 					e.preventDefault()
 					setSelectPage(page)
+					setQueryParams({ p: page.name }, selectPage === undefined)
 				}}
 			>
 				{page.name.split('/').map((part, rank, list) => (
@@ -376,6 +382,7 @@ class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, {
 function getQueryParams(): { [key: string]: string } {
 	return _.chain(window.location.search.replace(/^\?/, ''))
 		.split('&')
+		.compact()
 		.map(part => {
 			const [key, value] = part.split('=')
 			return [key, window.decodeURIComponent(value) ?? '']
@@ -393,6 +400,7 @@ function setQueryParams(params: { [key: string]: string | undefined }, replace: 
 			.value()
 			.join('&')
 
+	console.log('link', link, replace)
 	if (replace) {
 		window.history.replaceState(null, '', link)
 	} else {
