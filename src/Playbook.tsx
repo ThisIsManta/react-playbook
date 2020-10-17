@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import _ from 'lodash'
 
 function classNames(...classes: Array<any>) {
@@ -60,13 +60,18 @@ export default React.memo((props: Props) => {
 })
 
 function Playbook(props: Props) {
-	const [selectPage, setSelectPage] = useState(() => props.pages.find(page => page.name === getSearchQuery()['p']))
+	const [selectPage, setSelectPage] = useState(() => props.pages.find(page => page.name === getQueryParams()['p']))
 
-	const [searchText, setSearchText] = useState(window.sessionStorage.getItem('playbook__searchText') || '')
-	const onSearchBoxChange = useCallback((value: string) => {
-		setSearchText(value)
-		window.sessionStorage.setItem('playbook__searchText', value)
-	}, [])
+	useEffect(() => {
+		setQueryParams({ p: selectPage?.name }, false)
+	}, [selectPage])
+
+	const [searchText, setSearchText] = useState(() => getQueryParams()['q'] || '')
+
+	useEffect(() => {
+		setQueryParams({ q: searchText }, true)
+	}, [searchText])
+
 	const searchPatterns = useMemo(
 		() => _.words(searchText)
 			.map(word => new RegExp(_.escapeRegExp(word), 'i')),
@@ -90,7 +95,6 @@ function Playbook(props: Props) {
 						onClick={e => {
 							// Avoid re-rendering the whole page for performance while allow users to copy the links
 							e.preventDefault()
-							window.history.pushState(null, '', link)
 							setSelectPage(page)
 						}}
 					>
@@ -115,11 +119,11 @@ function Playbook(props: Props) {
 					placeholder='Search here'
 					value={searchText}
 					onChange={e => {
-						onSearchBoxChange(e.target.value)
+						setSearchText(e.target.value)
 					}}
 					onKeyUp={e => {
 						if (e.key === 'Escape') {
-							onSearchBoxChange('')
+							setSearchText('')
 						}
 					}}
 				/>
@@ -375,7 +379,7 @@ class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, {
 	}
 }
 
-function getSearchQuery(): { [key: string]: string } {
+function getQueryParams(): { [key: string]: string } {
 	return _.chain(window.location.search.replace(/^\?/, ''))
 		.split('&')
 		.map(part => {
@@ -384,4 +388,20 @@ function getSearchQuery(): { [key: string]: string } {
 		})
 		.fromPairs()
 		.value()
+}
+
+function setQueryParams(params: { [key: string]: string | undefined }, replace: boolean) {
+	const link = '?' +
+		_.chain({ ...getQueryParams(), ...params })
+			.toPairs()
+			.filter((pair): pair is [string, string] => !!pair[1])
+			.map(([key, value]) => key + '=' + window.encodeURIComponent(value))
+			.value()
+			.join('&')
+
+	if (replace) {
+		window.history.replaceState(null, '', link)
+	} else {
+		window.history.pushState(null, '', link)
+	}
 }
