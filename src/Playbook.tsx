@@ -16,6 +16,12 @@ type Props = {
 	pages: Array<IPlaybookPage>
 }
 
+const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''))
+
+if (previewPathName) {
+	document.body.classList.add('playbook__preview')
+}
+
 export default React.memo((props: Props) => {
 	const pages = useMemo(
 		() => _.chain(props.pages)
@@ -25,9 +31,8 @@ export default React.memo((props: Props) => {
 		[props.pages],
 	)
 
-	const path = window.decodeURI(window.location.pathname.replace(/^\//, ''))
-	if (path !== '') {
-		const page = pages.find(page => page.name === path)
+	if (previewPathName) {
+		const page = pages.find(page => page.name === previewPathName)
 
 		if (!page) {
 			return null
@@ -39,7 +44,7 @@ export default React.memo((props: Props) => {
 			return null
 		}
 
-		const index = window.location.hash.replace(/^#/, '')
+		const index = window.location.hash.replace(/^#/, '') || '0'
 		const element = elements[index]
 
 		if (!element) {
@@ -159,7 +164,6 @@ function Contents(props: { page: IPlaybookPage }) {
 			{elements.map((element, index) => (
 				<section key={props.page.name + '#' + index} className='playbook__content'>
 					<iframe
-						className='playbook__preview'
 						src={'/' + window.encodeURI(props.page.name) + '#' + index}
 						width='100%'
 						frameBorder='0'

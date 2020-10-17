@@ -4,6 +4,13 @@ body {
   height: 100vh;
 }
 
+body.playbook__preview {
+  width: auto;
+  height: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .playbook {
   display: flex;
   width: 100vw;
@@ -126,11 +133,6 @@ body {
 
 .playbook__property__function {
   font-style: italic;
-}
-
-.playbook__preview {
-  /* flex: 1; */
-  padding: 20px;
 }
 
 .playbook__content:last-child {
