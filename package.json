@@ -8,7 +8,7 @@
     "start": "parcel ./src/demo.html --out-dir tmp --open",
     "build": "rm -rf out && tsc --project ./tsconfig.json && lessc ./src/Playbook.less ./out/Playbook.css",
     "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build",
-    "postversion": "git push --tags origin"
+    "postversion": "git push --tags origin master:master"
   },
   "repository": {
     "type": "git",
