@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import Playbook from './Playbook'
-import './Playbook.css'
+import './Playbook.less'
 
 ReactDOM.render(
 	<Playbook

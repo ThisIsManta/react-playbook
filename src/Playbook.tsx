@@ -12,7 +12,6 @@ export interface IPlaybookPage {
 }
 
 type Props = {
-	toolbar?: React.ReactNode
 	pages: Array<IPlaybookPage>
 }
 
@@ -88,6 +87,9 @@ function Playbook(props: Props) {
 		[props.pages],
 	)
 
+	// Only for responsive view
+	const [leftMenuVisible, setLeftMenuVisible] = useState(false)
+
 	const menus = useMemo(
 		() => searcher.search(searchText).map(page => (
 			<a
@@ -102,6 +104,7 @@ function Playbook(props: Props) {
 					e.preventDefault()
 					setSelectPage(page)
 					setQueryParams({ p: page.name }, selectPage === undefined)
+					setLeftMenuVisible(false)
 				}}
 			>
 				{page.name.split('/').map((part, rank, list) => (
@@ -117,7 +120,12 @@ function Playbook(props: Props) {
 	return (
 		<div className='playbook'>
 			<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&family=Roboto+Mono:400,600&display=swap' rel='stylesheet' />
-			<div className='playbook__left'>
+			<div
+				className={classNames(
+					'playbook__left',
+					leftMenuVisible && 'playbook__left-responsive',
+				)}
+			>
 				<input
 					className='playbook__search-box'
 					type='text'
@@ -138,15 +146,26 @@ function Playbook(props: Props) {
 			</div>
 			<div className='playbook__right'>
 				<div className='playbook__toolbar'>
-					{props.toolbar}
+					<button
+						className='playbook__button'
+						onClick={() => { setLeftMenuVisible(value => !value) }}
+						title='Open navigation menu'
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px" style={{ display: 'block' }}>
+							<path d="M0 0h24v24H0z" fill="none" />
+							<path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+						</svg>
+					</button>
 				</div>
 				<div className='playbook__contents'>
-					{selectPage && <Contents page={selectPage} />}
+					{selectPage && <ContentsMemoized page={selectPage} />}
 				</div>
 			</div>
 		</div>
 	)
 }
+
+const ContentsMemoized = React.memo(Contents)
 
 function Contents(props: { page: IPlaybookPage }) {
 	const elements = getReactChildren(props.page.content)

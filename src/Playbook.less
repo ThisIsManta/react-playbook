@@ -1,14 +1,18 @@
+@left-side-width: 260px;
+@content-implicit-width: 300px;
+@content-property-width: 260px;
+
 body {
   margin: 0;
   width: 100vw;
   height: 100vh;
-}
 
-body.playbook__preview {
-  width: auto;
-  height: auto;
-  padding: 20px;
-  box-sizing: border-box;
+  &.playbook__preview {
+    width: auto;
+    height: auto;
+    padding: 20px;
+    box-sizing: border-box;
+  }
 }
 
 .playbook {
@@ -19,7 +23,8 @@ body.playbook__preview {
 }
 
 .playbook__left {
-  flex: 0 0 260px;
+  width: @left-side-width;
+  flex: 0 0 auto;
   transition: width 0.3s ease-out;
   background: gainsboro;
   box-sizing: border-box;
@@ -41,10 +46,10 @@ body.playbook__preview {
   outline: none;
   border-right: 1px solid gainsboro;
   color: #212121;
-}
 
-.playbook__search-box::placeholder {
-  color: gray;
+  &::placeholder {
+    color: gray;
+  }
 }
 
 .playbook__menu {
@@ -60,15 +65,15 @@ body.playbook__preview {
   color: #212121;
   text-decoration: none;
   word-break: break-word;
-}
 
-.playbook__menu__item:hover {
-  color: blue;
-}
+  &:hover {
+    color: blue;
+  }
 
-.playbook__menu__item.--select {
-  background: blue;
-  color: white;
+  &.--select {
+    background: blue;
+    color: white;
+  }
 }
 
 .playbook__menu__item__last {
@@ -84,14 +89,28 @@ body.playbook__preview {
 .playbook__toolbar {
   background: gainsboro;
   min-height: 30px;
-  display: flex;
   align-items: center;
-  padding: 5px 10px;
+  padding: 5px 5px;
   box-sizing: border-box;
+  display: none;
 }
 
-.playbook__toolbar:empty {
-  display: none;
+.playbook__button {
+  appearance: none;
+  border: 1px solid black;
+  fill: black;
+  background: white;
+  outline: none;
+  padding: 4px;
+
+  &:hover {
+    fill: blue;
+    border-color: blue;
+  }
+
+  &:focus {
+    border-color: blue;
+  }
 }
 
 .playbook__contents {
@@ -105,10 +124,15 @@ body.playbook__preview {
 .playbook__content {
   display: flex;
   border-bottom: 1px solid gainsboro;
+
+  &:last-child {
+    flex: 1;
+    border-bottom: none;
+  }
 }
 
 .playbook__property {
-  flex: 0 0 260px;
+  flex: 0 0 @content-property-width;
   font-family: Roboto Mono, Consolas;
   font-size: 12px;
   padding: 20px 5px;
@@ -125,19 +149,14 @@ body.playbook__preview {
 
 .playbook__property__indent .playbook__property__indent {
   margin-left: 16px;
-}
 
-.playbook__property__indent .playbook__property__indent:hover {
-  background: gainsboro;
+  &:hover {
+    background: gainsboro;
+  }
 }
 
 .playbook__property__function {
   font-style: italic;
-}
-
-.playbook__content:last-child {
-  flex: 1;
-  border-bottom: none;
 }
 
 .playbook__error {
@@ -147,4 +166,47 @@ body.playbook__preview {
   padding: 10px;
   font-family: Roboto, sans-serif;
   font-size: 14px;
+}
+
+@media (max-width: @left-side-width + @content-implicit-width + @content-property-width) {
+  .playbook__left {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+
+    &:not(.playbook__left-responsive) {
+      display: none;
+    }
+
+    &.playbook__left-responsive {
+      animation: playbook__slide-right 0.5s ease-out;
+    }
+
+    &.playbook__left-responsive .playbook__search-box {
+      border-right: none;
+    }
+  }
+
+  .playbook__toolbar {
+    display: flex;
+  }
+}
+
+@media (max-width: @content-implicit-width + @content-property-width) {
+  .playbook__property {
+    display: none;
+  }
+}
+
+@keyframes playbook__slide-right {
+  from {
+    transform: translateX(-100vw);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }

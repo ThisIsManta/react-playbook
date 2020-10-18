@@ -6,7 +6,7 @@
   "types": "out/index.d.ts",
   "scripts": {
     "start": "parcel ./src/demo.html --out-dir tmp --open",
-    "build": "rm -rf out && tsc --project ./tsconfig.json && cp ./src/*.css ./out",
+    "build": "rm -rf out && tsc --project ./tsconfig.json && lessc ./src/Playbook.less ./out/Playbook.css",
     "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build",
     "postversion": "git push --tags origin"
   },
@@ -32,6 +32,7 @@
     "@types/lodash": "^4.14.162",
     "@types/react": "^16.9.52",
     "@types/react-dom": "^16.9.8",
+    "less": "^3.12.2",
     "lodash": "^4.17.20",
     "parcel-bundler": "^1.12.4",
     "react": "^16.14.0",
