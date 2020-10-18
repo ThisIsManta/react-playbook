@@ -90,9 +90,18 @@ body {
   background: gainsboro;
   min-height: 30px;
   align-items: center;
-  padding: 5px 5px;
   box-sizing: border-box;
+  padding: 0 5px;
   display: none;
+
+  &> * {
+    vertical-align: top;
+    margin: 10px 5px;
+  }
+
+  &.playbook__toolbar-always-on {
+    display: block;
+  }
 }
 
 .playbook__button {
@@ -102,15 +111,27 @@ body {
   background: white;
   outline: none;
   padding: 4px;
-  font-size: 0;
+  min-height: 28px;
+  font-size: 16px;
+  line-height: 1;
+  box-sizing: border-box;
 
   &:hover {
-    fill: blue;
+    color: blue;
+    fill: blue; // For <svg>
     border-color: blue;
   }
 
   &:focus {
     border-color: blue;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &> svg {
+    display: block; // For <svg>
   }
 }
 
@@ -177,7 +198,15 @@ body {
   font-size: 14px;
 }
 
+#playbook__side-menu-toggle {
+  display: none;
+}
+
 @media (max-width: @left-side-width + @content-implicit-width + @content-property-width) {
+  #playbook__side-menu-toggle {
+    display: inline-block;
+  }
+
   .playbook__left {
     position: fixed;
     top: 0;
@@ -200,12 +229,12 @@ body {
   }
 
   .playbook__toolbar {
-    display: flex;
+    display: block;
   }
 }
 
 @media (max-width: @content-implicit-width + @content-property-width) {
-  .playbook__property {
+  .playbook__content__side-panel {
     display: none;
   }
 }

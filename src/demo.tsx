@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Playbook from './Playbook'
+import Playbook, { PlaybookButton } from './Playbook'
 import './Playbook.less'
 
 ReactDOM.render(
@@ -26,6 +26,12 @@ ReactDOM.render(
 				)
 			}
 		]}
+		contentWrapper={ContentWrapper}
+		contentControl={<PlaybookButton>Dummy</PlaybookButton>}
 	/>,
 	document.getElementById('root'),
 )
+
+function ContentWrapper(props: { children: React.ReactElement }) {
+	return <main>{props.children}</main>
+}
