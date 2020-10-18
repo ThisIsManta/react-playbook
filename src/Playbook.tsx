@@ -132,6 +132,12 @@ function Playbook(props: Props) {
 					'playbook__left',
 					leftMenuVisible && 'playbook__left-responsive',
 				)}
+				tabIndex={-1}
+				onKeyUp={e => {
+					if (e.key === 'Escape') {
+						setLeftMenuVisible(false)
+					}
+				}}
 			>
 				<input
 					className='playbook__search-box'
@@ -142,8 +148,9 @@ function Playbook(props: Props) {
 						setSearchText(e.target.value)
 					}}
 					onKeyUp={e => {
-						if (e.key === 'Escape') {
+						if (e.key === 'Escape' && searchText !== '') {
 							setSearchText('')
+							e.stopPropagation()
 						}
 					}}
 				/>
