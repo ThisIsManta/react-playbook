@@ -210,32 +210,31 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 
 				return (
 					<section key={props.page.name + '#' + index} className='playbook__content'>
-						<iframe
-							src={link}
-							width='100%'
-							frameBorder='0'
-							scrolling='no'
-							onLoad={(e) => {
-								if (e.currentTarget.contentWindow) {
-									e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-								}
-							}}
-						/>
+						<div className='playbook__content-container'>
+							<iframe
+								src={link}
+								width='100%'
+								frameBorder='0'
+								scrolling='no'
+								onLoad={(e) => {
+									if (e.currentTarget.contentWindow) {
+										e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
+									}
+								}}
+							/>
+							<PlaybookButton
+								id='playbook__new-window'
+								title='Open in a new tab'
+								onClick={() => { window.open(link, '_blank') }}
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24">
+									<rect fill="none" height="24" width="24" />
+									<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
+								</svg>
+							</PlaybookButton>
+						</div>
 						{props.propertyPanelVisible && (
-							<div className='playbook__content__side-panel'>
-								<div className='playbook__content__control'>
-									<PlaybookButton
-										title='Open in a new tab'
-										onClick={() => { window.open(link, '_blank') }}
-									>
-										<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="18" viewBox="0 0 24 24" width="18">
-											<rect fill="none" height="24" width="24" />
-											<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
-										</svg>
-									</PlaybookButton>
-								</div>
-								<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
-							</div>
+							<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
 						)}
 					</section>
 				)
