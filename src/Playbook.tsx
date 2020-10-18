@@ -151,7 +151,7 @@ function Playbook(props: Props) {
 						onClick={() => { setLeftMenuVisible(value => !value) }}
 						title='Open navigation menu'
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px" style={{ display: 'block' }}>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px">
 							<path d="M0 0h24v24H0z" fill="none" />
 							<path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
 						</svg>
@@ -180,22 +180,40 @@ function Contents(props: { page: IPlaybookPage }) {
 
 	return (
 		<React.Fragment>
-			{elements.map((element, index) => (
-				<section key={props.page.name + '#' + index} className='playbook__content'>
-					<iframe
-						src={'/' + window.encodeURI(props.page.name) + '#' + index}
-						width='100%'
-						frameBorder='0'
-						scrolling='no'
-						onLoad={(e) => {
-							if (e.currentTarget.contentWindow) {
-								e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-							}
-						}}
-					/>
-					<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
-				</section>
-			))}
+			{elements.map((element, index) => {
+				const link = '/' + window.encodeURI(props.page.name) + '#' + index
+
+				return (
+					<section key={props.page.name + '#' + index} className='playbook__content'>
+						<iframe
+							src={link}
+							width='100%'
+							frameBorder='0'
+							scrolling='no'
+							onLoad={(e) => {
+								if (e.currentTarget.contentWindow) {
+									e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
+								}
+							}}
+						/>
+						<div className='playbook__content__side-panel'>
+							<div className='playbook__content__control'>
+								<button
+									className='playbook__button'
+									onClick={() => { window.open(link, '_blank') }}
+									title='Open in a new tab'
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="18" viewBox="0 0 24 24" width="18">
+										<rect fill="none" height="24" width="24" />
+										<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
+									</svg>
+								</button>
+							</div>
+							<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
+						</div>
+					</section>
+				)
+			})}
 		</React.Fragment>
 	)
 }

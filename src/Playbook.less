@@ -102,6 +102,7 @@ body {
   background: white;
   outline: none;
   padding: 4px;
+  font-size: 0;
 
   &:hover {
     fill: blue;
@@ -131,16 +132,24 @@ body {
   }
 }
 
-.playbook__property {
+.playbook__content__side-panel {
   flex: 0 0 @content-property-width;
-  font-family: Roboto Mono, Consolas;
-  font-size: 12px;
-  padding: 20px 5px;
   box-sizing: border-box;
   border-left: 1px solid gainsboro;
-  word-break: break-word;
   background: white;
+}
+
+.playbook__content__control {
+  text-align: right;
+  margin: 10px;
+}
+
+.playbook__property {
+  font-family: Roboto Mono, Consolas;
+  font-size: 12px;
+  word-break: break-word;
   color: #212121;
+  margin: 10px 5px;
 }
 
 .playbook__property__tag {
