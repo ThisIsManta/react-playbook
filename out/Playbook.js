@@ -63,6 +63,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var lodash_1 = __importDefault(require("lodash"));
+var fuzzy_search_1 = __importDefault(require("fuzzy-search"));
 function classNames() {
     var classes = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -70,14 +71,17 @@ function classNames() {
     }
     return lodash_1.default.compact(classes).join(' ');
 }
+var previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''));
+if (previewPathName) {
+    document.body.classList.add('playbook__preview');
+}
 exports.default = react_1.default.memo(function (props) {
     var pages = react_1.useMemo(function () { return lodash_1.default.chain(props.pages)
         .uniqBy(function (page) { return page.name; })
         .sortBy(function (page) { return page.name; })
         .value(); }, [props.pages]);
-    var path = window.decodeURI(window.location.pathname.replace(/^\//, ''));
-    if (path !== '') {
-        var page = pages.find(function (page) { return page.name === path; });
+    if (previewPathName) {
+        var page = pages.find(function (page) { return page.name === previewPathName; });
         if (!page) {
             return null;
         }
@@ -85,7 +89,7 @@ exports.default = react_1.default.memo(function (props) {
         if (elements.length === 0) {
             return null;
         }
-        var index = window.location.hash.replace(/^#/, '');
+        var index = window.location.hash.replace(/^#/, '') || '0';
         var element = elements[index];
         if (!element) {
             return null;
@@ -96,43 +100,51 @@ exports.default = react_1.default.memo(function (props) {
         react_1.default.createElement(Playbook, __assign({}, props))));
 });
 function Playbook(props) {
-    var _a = __read(react_1.useState(function () { return props.pages.find(function (page) { return page.name === getSearchQuery()['p']; }); }), 2), selectPage = _a[0], setSelectPage = _a[1];
-    var _b = __read(react_1.useState(window.sessionStorage.getItem('playbook__searchText') || ''), 2), searchText = _b[0], setSearchText = _b[1];
-    var onSearchBoxChange = react_1.useCallback(function (value) {
-        setSearchText(value);
-        window.sessionStorage.setItem('playbook__searchText', value);
+    var getSelectPage = react_1.useCallback(function () { return props.pages.find(function (page) { return page.name === getQueryParams()['p']; }); }, [props.pages]);
+    var getSearchText = react_1.useCallback(function () { return getQueryParams()['q'] || ''; }, []);
+    var _a = __read(react_1.useState(getSelectPage), 2), selectPage = _a[0], setSelectPage = _a[1];
+    var _b = __read(react_1.useState(getSearchText), 2), searchText = _b[0], setSearchText = _b[1];
+    react_1.useEffect(function () {
+        window.addEventListener('popstate', function () {
+            setSelectPage(getSelectPage());
+            setSearchText(getSearchText());
+        });
     }, []);
-    var searchPatterns = react_1.useMemo(function () { return lodash_1.default.words(searchText)
-        .map(function (word) { return new RegExp(lodash_1.default.escapeRegExp(word), 'i'); }); }, [searchText]);
-    var menus = react_1.useMemo(function () { return props.pages
-        .filter(function (page) { return searchPatterns.length === 0 || searchPatterns.every(function (pattern) { return pattern.test(page.name); }); })
-        .map(function (page) {
-        var link = '?p=' + window.encodeURI(page.name);
-        return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', page === selectPage && '--select'), href: link, onClick: function (e) {
-                e.preventDefault();
-                window.history.pushState(null, '', link);
-                setSelectPage(page);
-            } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
-            ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
-            : react_1.default.createElement("span", { key: rank },
-                part,
-                "/")); })));
-    }); }, [props.pages, selectPage, searchPatterns]);
+    react_1.useEffect(function () {
+        setQueryParams({ q: searchText }, true);
+    }, [searchText]);
+    var searcher = react_1.useMemo(function () { return new fuzzy_search_1.default(props.pages, ['name'], { caseSensitive: false, sort: true }); }, [props.pages]);
+    var _c = __read(react_1.useState(false), 2), leftMenuVisible = _c[0], setLeftMenuVisible = _c[1];
+    var menus = react_1.useMemo(function () { return searcher.search(searchText).map(function (page) { return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', page === selectPage && '--select'), href: '?p=' + window.encodeURI(page.name), onClick: function (e) {
+            e.preventDefault();
+            setSelectPage(page);
+            setQueryParams({ p: page.name }, selectPage === undefined);
+            setLeftMenuVisible(false);
+        } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
+        ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
+        : react_1.default.createElement("span", { key: rank },
+            part,
+            "/")); }))); }); }, [searcher, searchText, selectPage]);
     return (react_1.default.createElement("div", { className: 'playbook' },
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&family=Roboto+Mono:400,600&display=swap', rel: 'stylesheet' }),
-        react_1.default.createElement("div", { className: 'playbook__left' },
+        react_1.default.createElement("div", { className: classNames('playbook__left', leftMenuVisible && 'playbook__left-responsive') },
             react_1.default.createElement("input", { className: 'playbook__search-box', type: 'text', placeholder: 'Search here', value: searchText, onChange: function (e) {
-                    onSearchBoxChange(e.target.value);
+                    setSearchText(e.target.value);
                 }, onKeyUp: function (e) {
                     if (e.key === 'Escape') {
-                        onSearchBoxChange('');
+                        setSearchText('');
                     }
                 } }),
             react_1.default.createElement("div", { className: 'playbook__menu' }, menus)),
         react_1.default.createElement("div", { className: 'playbook__right' },
-            react_1.default.createElement("div", { className: 'playbook__toolbar' }, props.toolbar),
-            react_1.default.createElement("div", { className: 'playbook__contents' }, selectPage && react_1.default.createElement(Contents, { page: selectPage })))));
+            react_1.default.createElement("div", { className: 'playbook__toolbar' },
+                react_1.default.createElement("button", { className: 'playbook__button', onClick: function () { setLeftMenuVisible(function (value) { return !value; }); }, title: 'Open navigation menu' },
+                    react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", width: "18px", height: "18px" },
+                        react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
+                        react_1.default.createElement("path", { d: "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" })))),
+            react_1.default.createElement("div", { className: 'playbook__contents' }, selectPage && react_1.default.createElement(ContentsMemoized, { page: selectPage })))));
 }
+var ContentsMemoized = react_1.default.memo(Contents);
 function Contents(props) {
     var elements = getReactChildren(props.page.content);
     if (elements.length === 0) {
@@ -141,13 +153,22 @@ function Contents(props) {
             JSON.stringify(props.page.content),
             "."));
     }
-    return (react_1.default.createElement(react_1.default.Fragment, null, elements.map(function (element, index) { return (react_1.default.createElement("section", { key: props.page.name + '#' + index, className: 'playbook__content' },
-        react_1.default.createElement("iframe", { className: 'playbook__preview', src: '/' + window.encodeURI(props.page.name) + '#' + index, width: '100%', frameBorder: '0', scrolling: 'no', onLoad: function (e) {
-                if (e.currentTarget.contentWindow) {
-                    e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-                }
-            } }),
-        react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } }))); })));
+    return (react_1.default.createElement(react_1.default.Fragment, null, elements.map(function (element, index) {
+        var link = '/' + window.encodeURI(props.page.name) + '#' + index;
+        return (react_1.default.createElement("section", { key: props.page.name + '#' + index, className: 'playbook__content' },
+            react_1.default.createElement("iframe", { src: link, width: '100%', frameBorder: '0', scrolling: 'no', onLoad: function (e) {
+                    if (e.currentTarget.contentWindow) {
+                        e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
+                    }
+                } }),
+            react_1.default.createElement("div", { className: 'playbook__content__side-panel' },
+                react_1.default.createElement("div", { className: 'playbook__content__control' },
+                    react_1.default.createElement("button", { className: 'playbook__button', onClick: function () { window.open(link, '_blank'); }, title: 'Open in a new tab' },
+                        react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", height: "18", viewBox: "0 0 24 24", width: "18" },
+                            react_1.default.createElement("rect", { fill: "none", height: "24", width: "24" }),
+                            react_1.default.createElement("path", { d: "M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" })))),
+                react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } }))));
+    })));
 }
 function getReactChildren(element) {
     if (lodash_1.default.isArray(element)) {
@@ -314,9 +335,10 @@ var ErrorBoundary = (function (_super) {
     };
     return ErrorBoundary;
 }(react_1.default.PureComponent));
-function getSearchQuery() {
+function getQueryParams() {
     return lodash_1.default.chain(window.location.search.replace(/^\?/, ''))
         .split('&')
+        .compact()
         .map(function (part) {
         var _a;
         var _b = __read(part.split('='), 2), key = _b[0], value = _b[1];
@@ -324,4 +346,23 @@ function getSearchQuery() {
     })
         .fromPairs()
         .value();
+}
+function setQueryParams(params, replace) {
+    var link = '?' +
+        lodash_1.default.chain(__assign(__assign({}, getQueryParams()), params))
+            .toPairs()
+            .filter(function (pair) { return !!pair[1]; })
+            .map(function (_a) {
+            var _b = __read(_a, 2), key = _b[0], value = _b[1];
+            return key + '=' + window.encodeURIComponent(value);
+        })
+            .value()
+            .join('&');
+    console.log('link', link, replace);
+    if (replace) {
+        window.history.replaceState(null, '', link);
+    }
+    else {
+        window.history.pushState(null, '', link);
+    }
 }

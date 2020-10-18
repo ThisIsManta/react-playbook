@@ -3,16 +3,21 @@ body {
   width: 100vw;
   height: 100vh;
 }
-
+body.playbook__preview {
+  width: auto;
+  height: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
 .playbook {
   display: flex;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
-
 .playbook__left {
-  flex: 0 0 260px;
+  width: 260px;
+  flex: 0 0 auto;
   transition: width 0.3s ease-out;
   background: gainsboro;
   box-sizing: border-box;
@@ -22,7 +27,6 @@ body {
   font-family: Roboto, sans-serif;
   font-size: 14px;
 }
-
 .playbook__search-box {
   width: 100%;
   padding: 0 10px;
@@ -35,18 +39,15 @@ body {
   border-right: 1px solid gainsboro;
   color: #212121;
 }
-
 .playbook__search-box::placeholder {
   color: gray;
 }
-
 .playbook__menu {
   flex: 1;
   padding: 10px 0;
   overflow-x: hidden;
   overflow-y: auto;
 }
-
 .playbook__menu__item {
   display: block;
   padding: 5px 10px;
@@ -54,39 +55,45 @@ body {
   text-decoration: none;
   word-break: break-word;
 }
-
 .playbook__menu__item:hover {
   color: blue;
 }
-
 .playbook__menu__item.--select {
   background: blue;
   color: white;
 }
-
 .playbook__menu__item__last {
   font-weight: 500;
 }
-
 .playbook__right {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-
 .playbook__toolbar {
   background: gainsboro;
   min-height: 30px;
-  display: flex;
   align-items: center;
-  padding: 5px 10px;
+  padding: 5px 5px;
   box-sizing: border-box;
-}
-
-.playbook__toolbar:empty {
   display: none;
 }
-
+.playbook__button {
+  appearance: none;
+  border: 1px solid black;
+  fill: black;
+  background: white;
+  outline: none;
+  padding: 4px;
+  font-size: 0;
+}
+.playbook__button:hover {
+  fill: blue;
+  border-color: blue;
+}
+.playbook__button:focus {
+  border-color: blue;
+}
 .playbook__contents {
   display: flex;
   flex-direction: column;
@@ -94,50 +101,43 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-
 .playbook__content {
   display: flex;
   border-bottom: 1px solid gainsboro;
 }
-
-.playbook__property {
-  flex: 0 0 260px;
-  font-family: Roboto Mono, Consolas;
-  font-size: 12px;
-  padding: 20px 5px;
-  box-sizing: border-box;
-  border-left: 1px solid gainsboro;
-  word-break: break-word;
-  background: white;
-  color: #212121;
-}
-
-.playbook__property__tag {
-  font-weight: 600;
-}
-
-.playbook__property__indent .playbook__property__indent {
-  margin-left: 16px;
-}
-
-.playbook__property__indent .playbook__property__indent:hover {
-  background: gainsboro;
-}
-
-.playbook__property__function {
-  font-style: italic;
-}
-
-.playbook__preview {
-  /* flex: 1; */
-  padding: 20px;
-}
-
 .playbook__content:last-child {
   flex: 1;
   border-bottom: none;
 }
-
+.playbook__content__side-panel {
+  flex: 0 0 260px;
+  box-sizing: border-box;
+  border-left: 1px solid gainsboro;
+  background: white;
+}
+.playbook__content__control {
+  text-align: right;
+  margin: 10px;
+}
+.playbook__property {
+  font-family: Roboto Mono, Consolas;
+  font-size: 12px;
+  word-break: break-word;
+  color: #212121;
+  margin: 10px 5px;
+}
+.playbook__property__tag {
+  font-weight: 600;
+}
+.playbook__property__indent .playbook__property__indent {
+  margin-left: 16px;
+}
+.playbook__property__indent .playbook__property__indent:hover {
+  background: gainsboro;
+}
+.playbook__property__function {
+  font-style: italic;
+}
 .playbook__error {
   display: inline-block;
   background: #ffebee;
@@ -145,4 +145,39 @@ body {
   padding: 10px;
   font-family: Roboto, sans-serif;
   font-size: 14px;
+}
+@media (max-width: 820px) {
+  .playbook__left {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+  .playbook__left:not(.playbook__left-responsive) {
+    display: none;
+  }
+  .playbook__left.playbook__left-responsive {
+    animation: playbook__slide-right 0.5s ease-out;
+  }
+  .playbook__left.playbook__left-responsive .playbook__search-box {
+    border-right: none;
+  }
+  .playbook__toolbar {
+    display: flex;
+  }
+}
+@media (max-width: 560px) {
+  .playbook__property {
+    display: none;
+  }
+}
+@keyframes playbook__slide-right {
+  from {
+    transform: translateX(-100vw);
+  }
+  to {
+    transform: translateX(0);
+  }
 }

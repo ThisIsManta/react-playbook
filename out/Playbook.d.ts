@@ -4,7 +4,6 @@ export interface IPlaybookPage {
     content: React.ReactFragment;
 }
 declare type Props = {
-    toolbar?: React.ReactNode;
     pages: Array<IPlaybookPage>;
 };
 declare const _default: React.MemoExoticComponent<(props: Props) => JSX.Element | null>;

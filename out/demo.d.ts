@@ -1,1 +1,1 @@
-import './Playbook.css';
+import './Playbook.less';

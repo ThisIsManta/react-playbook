@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importDefault(require("react"));
 var react_dom_1 = __importDefault(require("react-dom"));
 var Playbook_1 = __importDefault(require("./Playbook"));
-require("./Playbook.css");
+require("./Playbook.less");
 react_dom_1.default.render(react_1.default.createElement(Playbook_1.default, { pages: [
         {
             name: 'button',
