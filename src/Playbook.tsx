@@ -212,6 +212,7 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 					<section key={props.page.name + '#' + index} className='playbook__content'>
 						<div className='playbook__content-container'>
 							<iframe
+								data-playbook-content={true}
 								src={link}
 								width='100%'
 								frameBorder='0'
