@@ -94,7 +94,9 @@ exports.default = react_1.default.memo(function (props) {
         if (!element) {
             return null;
         }
-        return (react_1.default.createElement(ErrorBoundary, null, element));
+        return (react_1.default.createElement(ErrorBoundary, null, props.contentWrapper
+            ? react_1.default.createElement(props.contentWrapper, null, element)
+            : element));
     }
     return (react_1.default.createElement(ErrorBoundary, null,
         react_1.default.createElement(Playbook, __assign({}, props))));
@@ -115,34 +117,54 @@ function Playbook(props) {
     }, [searchText]);
     var searcher = react_1.useMemo(function () { return new fuzzy_search_1.default(props.pages, ['name'], { caseSensitive: false, sort: true }); }, [props.pages]);
     var _c = __read(react_1.useState(false), 2), leftMenuVisible = _c[0], setLeftMenuVisible = _c[1];
-    var menus = react_1.useMemo(function () { return searcher.search(searchText).map(function (page) { return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', page === selectPage && '--select'), href: '?p=' + window.encodeURI(page.name), onClick: function (e) {
-            e.preventDefault();
-            setSelectPage(page);
-            setQueryParams({ p: page.name }, selectPage === undefined);
-            setLeftMenuVisible(false);
-        } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
-        ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
-        : react_1.default.createElement("span", { key: rank },
-            part,
-            "/")); }))); }); }, [searcher, searchText, selectPage]);
+    var _d = __read(react_1.useState(true), 2), propertyPanelVisible = _d[0], setPropertyPanelVisible = _d[1];
+    var menus = react_1.useMemo(function () { return searcher.search(searchText).map(function (page) {
+        var _a;
+        return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', page.name === ((_a = selectPage) === null || _a === void 0 ? void 0 : _a.name) && '--select'), href: '?p=' + window.encodeURI(page.name), onClick: function (e) {
+                e.preventDefault();
+                setSelectPage(page);
+                setQueryParams({ p: page.name }, selectPage === undefined);
+                setLeftMenuVisible(false);
+            } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
+            ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
+            : react_1.default.createElement("span", { key: rank },
+                part,
+                "/")); })));
+    }); }, [searcher, searchText, selectPage]);
     return (react_1.default.createElement("div", { className: 'playbook' },
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&family=Roboto+Mono:400,600&display=swap', rel: 'stylesheet' }),
-        react_1.default.createElement("div", { className: classNames('playbook__left', leftMenuVisible && 'playbook__left-responsive') },
+        react_1.default.createElement("div", { className: classNames('playbook__left', leftMenuVisible && 'playbook__left-responsive'), tabIndex: -1, onKeyUp: function (e) {
+                if (e.key === 'Escape') {
+                    setLeftMenuVisible(false);
+                }
+            } },
             react_1.default.createElement("input", { className: 'playbook__search-box', type: 'text', placeholder: 'Search here', value: searchText, onChange: function (e) {
                     setSearchText(e.target.value);
                 }, onKeyUp: function (e) {
-                    if (e.key === 'Escape') {
+                    if (e.key === 'Escape' && searchText !== '') {
                         setSearchText('');
+                        e.stopPropagation();
                     }
                 } }),
             react_1.default.createElement("div", { className: 'playbook__menu' }, menus)),
         react_1.default.createElement("div", { className: 'playbook__right' },
             react_1.default.createElement("div", { className: 'playbook__toolbar' },
-                react_1.default.createElement("button", { className: 'playbook__button', onClick: function () { setLeftMenuVisible(function (value) { return !value; }); }, title: 'Open navigation menu' },
-                    react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", width: "18px", height: "18px" },
+                react_1.default.createElement(PlaybookButton, { id: 'playbook__side-menu-toggle', title: 'Open navigation menu', onClick: function () { setLeftMenuVisible(function (value) { return !value; }); } },
+                    react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
                         react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
-                        react_1.default.createElement("path", { d: "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" })))),
-            react_1.default.createElement("div", { className: 'playbook__contents' }, selectPage && react_1.default.createElement(ContentsMemoized, { page: selectPage })))));
+                        react_1.default.createElement("path", { d: "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" }))),
+                react_1.default.isValidElement(props.contentControl) || !props.contentControl
+                    ? props.contentControl
+                    : react_1.default.createElement(props.contentControl, null),
+                react_1.default.createElement("div", { style: { flex: '1 1 auto' } }),
+                react_1.default.createElement(PlaybookButton, { id: 'playbook__property-panel-toggle', title: propertyPanelVisible ? 'Hide property panel' : 'Show property panel', onClick: function () { setPropertyPanelVisible(function (value) { return !value; }); } }, propertyPanelVisible
+                    ? react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
+                        react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
+                        react_1.default.createElement("path", { d: "M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" }))
+                    : react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
+                        react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
+                        react_1.default.createElement("path", { d: "M23 21.74l-1.46-1.46L7.21 5.95 3.25 1.99 1.99 3.25l2.7 2.7h-.64c-1.11 0-1.99.89-1.99 2l-.01 11c0 1.11.89 2 2 2h15.64L21.74 23 23 21.74zM22 7.95c.05-1.11-.84-2-1.95-1.95h-4V3.95c0-1.11-.89-2-2-1.95h-4c-1.11-.05-2 .84-2 1.95v.32l13.95 14V7.95zM14.05 6H10V3.95h4.05V6z" })))),
+            react_1.default.createElement("div", { className: 'playbook__contents' }, selectPage && (react_1.default.createElement(ContentsMemoized, { page: selectPage, propertyPanelVisible: propertyPanelVisible }))))));
 }
 var ContentsMemoized = react_1.default.memo(Contents);
 function Contents(props) {
@@ -156,20 +178,23 @@ function Contents(props) {
     return (react_1.default.createElement(react_1.default.Fragment, null, elements.map(function (element, index) {
         var link = '/' + window.encodeURI(props.page.name) + '#' + index;
         return (react_1.default.createElement("section", { key: props.page.name + '#' + index, className: 'playbook__content' },
-            react_1.default.createElement("iframe", { src: link, width: '100%', frameBorder: '0', scrolling: 'no', onLoad: function (e) {
-                    if (e.currentTarget.contentWindow) {
-                        e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-                    }
-                } }),
-            react_1.default.createElement("div", { className: 'playbook__content__side-panel' },
-                react_1.default.createElement("div", { className: 'playbook__content__control' },
-                    react_1.default.createElement("button", { className: 'playbook__button', onClick: function () { window.open(link, '_blank'); }, title: 'Open in a new tab' },
-                        react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", height: "18", viewBox: "0 0 24 24", width: "18" },
-                            react_1.default.createElement("rect", { fill: "none", height: "24", width: "24" }),
-                            react_1.default.createElement("path", { d: "M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" })))),
-                react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } }))));
+            react_1.default.createElement("div", { className: 'playbook__content-container' },
+                react_1.default.createElement("iframe", { "data-playbook-content": true, src: link, width: '100%', frameBorder: '0', scrolling: 'no', onLoad: function (e) {
+                        if (e.currentTarget.contentWindow) {
+                            e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
+                        }
+                    } }),
+                react_1.default.createElement(PlaybookButton, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: function () { window.open(link, '_blank'); } },
+                    react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", viewBox: "0 0 24 24" },
+                        react_1.default.createElement("rect", { fill: "none", height: "24", width: "24" }),
+                        react_1.default.createElement("path", { d: "M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" })))),
+            props.propertyPanelVisible && (react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } }))));
     })));
 }
+function PlaybookButton(props) {
+    return react_1.default.createElement("button", __assign({ className: 'playbook__button' }, props));
+}
+exports.PlaybookButton = PlaybookButton;
 function getReactChildren(element) {
     if (lodash_1.default.isArray(element)) {
         return Δ(element);
@@ -358,7 +383,6 @@ function setQueryParams(params, replace) {
         })
             .value()
             .join('&');
-    console.log('link', link, replace);
     if (replace) {
         window.history.replaceState(null, '', link);
     }

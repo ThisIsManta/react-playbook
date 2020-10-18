@@ -26,6 +26,8 @@ body.playbook__preview {
   flex-direction: column;
   font-family: Roboto, sans-serif;
   font-size: 14px;
+  z-index: 1;
+  outline: none;
 }
 .playbook__search-box {
   width: 100%;
@@ -71,12 +73,15 @@ body.playbook__preview {
   flex-direction: column;
 }
 .playbook__toolbar {
+  display: flex;
   background: gainsboro;
   min-height: 30px;
   align-items: center;
-  padding: 5px 5px;
   box-sizing: border-box;
-  display: none;
+  padding: 5px;
+}
+.playbook__toolbar > * {
+  margin: 5px;
 }
 .playbook__button {
   appearance: none;
@@ -85,14 +90,26 @@ body.playbook__preview {
   background: white;
   outline: none;
   padding: 4px;
-  font-size: 0;
+  min-height: 28px;
+  font-size: 16px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 .playbook__button:hover {
+  color: blue;
   fill: blue;
   border-color: blue;
 }
 .playbook__button:focus {
   border-color: blue;
+}
+.playbook__button:active {
+  transform: translateY(1px);
+}
+.playbook__button > svg {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 .playbook__contents {
   display: flex;
@@ -109,22 +126,26 @@ body.playbook__preview {
   flex: 1;
   border-bottom: none;
 }
-.playbook__content__side-panel {
+.playbook__content-container {
+  position: relative;
+  flex: 1 0 auto;
+  z-index: 0;
+}
+#playbook__new-window {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.playbook__property {
   flex: 0 0 260px;
   box-sizing: border-box;
   border-left: 1px solid gainsboro;
   background: white;
-}
-.playbook__content__control {
-  text-align: right;
-  margin: 10px;
-}
-.playbook__property {
   font-family: Roboto Mono, Consolas;
   font-size: 12px;
   word-break: break-word;
   color: #212121;
-  margin: 10px 5px;
+  padding: 10px 5px 20px 10px;
 }
 .playbook__property__tag {
   font-weight: 600;
@@ -146,7 +167,13 @@ body.playbook__preview {
   font-family: Roboto, sans-serif;
   font-size: 14px;
 }
+#playbook__side-menu-toggle {
+  display: none;
+}
 @media (max-width: 820px) {
+  #playbook__side-menu-toggle {
+    display: inline-block;
+  }
   .playbook__left {
     position: fixed;
     top: 0;
@@ -164,11 +191,11 @@ body.playbook__preview {
   .playbook__left.playbook__left-responsive .playbook__search-box {
     border-right: none;
   }
-  .playbook__toolbar {
-    display: flex;
-  }
 }
 @media (max-width: 560px) {
+  #playbook__property-panel-toggle {
+    display: none;
+  }
   .playbook__property {
     display: none;
   }
