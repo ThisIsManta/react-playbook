@@ -95,6 +95,8 @@ function Playbook(props: Props) {
 	// Only for responsive view
 	const [leftMenuVisible, setLeftMenuVisible] = useState(false)
 
+	const [propertyPanelVisible, setPropertyPanelVisible] = useState(true)
+
 	const menus = useMemo(
 		() => searcher.search(searchText).map(page => (
 			<a
@@ -150,18 +152,13 @@ function Playbook(props: Props) {
 				</div>
 			</div>
 			<div className='playbook__right'>
-				<div
-					className={classNames(
-						'playbook__toolbar',
-						props.contentControl && 'playbook__toolbar-always-on',
-					)}
-				>
+				<div className='playbook__toolbar'>
 					<PlaybookButton
 						id='playbook__side-menu-toggle'
 						title='Open navigation menu'
 						onClick={() => { setLeftMenuVisible(value => !value) }}
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 							<path d="M0 0h24v24H0z" fill="none" />
 							<path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
 						</svg>
@@ -169,9 +166,24 @@ function Playbook(props: Props) {
 					{React.isValidElement(props.contentControl) || !props.contentControl
 						? props.contentControl
 						: <props.contentControl />}
+					<div style={{ flex: '1 1 auto' }} />
+					<PlaybookButton
+						id='playbook__property-panel-toggle'
+						title={propertyPanelVisible ? 'Hide property panel' : 'Show property panel'}
+						onClick={() => { setPropertyPanelVisible(value => !value) }}
+					>
+						{propertyPanelVisible
+							? <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" /></svg>
+							: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M23 21.74l-1.46-1.46L7.21 5.95 3.25 1.99 1.99 3.25l2.7 2.7h-.64c-1.11 0-1.99.89-1.99 2l-.01 11c0 1.11.89 2 2 2h15.64L21.74 23 23 21.74zM22 7.95c.05-1.11-.84-2-1.95-1.95h-4V3.95c0-1.11-.89-2-2-1.95h-4c-1.11-.05-2 .84-2 1.95v.32l13.95 14V7.95zM14.05 6H10V3.95h4.05V6z" /></svg>}
+					</PlaybookButton>
 				</div>
 				<div className='playbook__contents'>
-					{selectPage && <ContentsMemoized page={selectPage} />}
+					{selectPage && (
+						<ContentsMemoized
+							page={selectPage}
+							propertyPanelVisible={propertyPanelVisible}
+						/>
+					)}
 				</div>
 			</div>
 		</div>
@@ -180,7 +192,7 @@ function Playbook(props: Props) {
 
 const ContentsMemoized = React.memo(Contents)
 
-function Contents(props: { page: IPlaybookPage }) {
+function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean }) {
 	const elements = getReactChildren(props.page.content)
 
 	if (elements.length === 0) {
@@ -209,20 +221,22 @@ function Contents(props: { page: IPlaybookPage }) {
 								}
 							}}
 						/>
-						<div className='playbook__content__side-panel'>
-							<div className='playbook__content__control'>
-								<PlaybookButton
-									title='Open in a new tab'
-									onClick={() => { window.open(link, '_blank') }}
-								>
-									<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="18" viewBox="0 0 24 24" width="18">
-										<rect fill="none" height="24" width="24" />
-										<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
-									</svg>
-								</PlaybookButton>
+						{props.propertyPanelVisible && (
+							<div className='playbook__content__side-panel'>
+								<div className='playbook__content__control'>
+									<PlaybookButton
+										title='Open in a new tab'
+										onClick={() => { window.open(link, '_blank') }}
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="18" viewBox="0 0 24 24" width="18">
+											<rect fill="none" height="24" width="24" />
+											<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
+										</svg>
+									</PlaybookButton>
+								</div>
+								<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
 							</div>
-							<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
-						</div>
+						)}
 					</section>
 				)
 			})}

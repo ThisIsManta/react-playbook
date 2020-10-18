@@ -87,20 +87,15 @@ body {
 }
 
 .playbook__toolbar {
+  display: flex;
   background: gainsboro;
   min-height: 30px;
   align-items: center;
   box-sizing: border-box;
   padding: 0 5px;
-  display: none;
 
   &> * {
-    vertical-align: top;
     margin: 10px 5px;
-  }
-
-  &.playbook__toolbar-always-on {
-    display: block;
   }
 }
 
@@ -131,6 +126,8 @@ body {
   }
 
   &> svg {
+    width: 18px;
+    height: 18px;
     display: block; // For <svg>
   }
 }
@@ -227,13 +224,13 @@ body {
       border-right: none;
     }
   }
-
-  .playbook__toolbar {
-    display: block;
-  }
 }
 
 @media (max-width: @content-implicit-width + @content-property-width) {
+  #playbook__property-panel-toggle {
+    display: none;
+  }
+
   .playbook__content__side-panel {
     display: none;
   }
