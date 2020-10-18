@@ -1,6 +1,7 @@
 @left-side-width: 260px;
 @content-implicit-width: 300px;
 @content-property-width: 260px;
+@content-z-index: 0;
 
 body {
   margin: 0;
@@ -33,6 +34,7 @@ body {
   flex-direction: column;
   font-family: Roboto, sans-serif;
   font-size: 14px;
+  z-index: @content-z-index + 1;
 }
 
 .playbook__search-box {
@@ -92,10 +94,10 @@ body {
   min-height: 30px;
   align-items: center;
   box-sizing: border-box;
-  padding: 0 5px;
+  padding: 5px;
 
   &> * {
-    margin: 10px 5px;
+    margin: 5px;
   }
 }
 
@@ -153,6 +155,7 @@ body {
 .playbook__content-container {
   position: relative;
   flex: 1 0 auto;
+  z-index: @content-z-index;
 }
 
 #playbook__new-window {
