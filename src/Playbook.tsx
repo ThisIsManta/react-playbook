@@ -103,7 +103,7 @@ function Playbook(props: Props) {
 				key={page.name}
 				className={classNames(
 					'playbook__menu__item',
-					page === selectPage && '--select',
+					page.name === selectPage?.name && '--select',
 				)}
 				href={'?p=' + window.encodeURI(page.name)}
 				onClick={e => {
@@ -478,7 +478,6 @@ function setQueryParams(params: { [key: string]: string | undefined }, replace: 
 			.value()
 			.join('&')
 
-	console.log('link', link, replace)
 	if (replace) {
 		window.history.replaceState(null, '', link)
 	} else {
