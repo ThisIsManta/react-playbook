@@ -1,7 +1,25 @@
+:root {
+  --theme: white;
+  --panel: gainsboro;
+  --border: gainsboro;
+  --text: #212121;
+  --placeholder: gray;
+  --accent: #0336FF;
+}
+.playbook__dark-mode {
+  --theme: black;
+  --panel: #212121;
+  --border: #212121;
+  --text: #FAFAFA;
+  --placeholder: #9E9E9E;
+  --accent: #FFDE03;
+}
 body {
   margin: 0;
   width: 100vw;
   height: 100vh;
+  background: var(--theme);
+  color: var(--text);
 }
 body.playbook__preview {
   width: auto;
@@ -19,7 +37,7 @@ body.playbook__preview {
   width: 260px;
   flex: 0 0 auto;
   transition: width 0.3s ease-out;
-  background: gainsboro;
+  background: var(--panel);
   box-sizing: border-box;
   user-select: none;
   display: flex;
@@ -38,11 +56,12 @@ body.playbook__preview {
   font-size: 14px;
   border: none;
   outline: none;
-  border-right: 1px solid gainsboro;
-  color: #212121;
+  border-right: 1px solid var(--border);
+  background: var(--theme);
+  color: var(--text);
 }
 .playbook__search-box::placeholder {
-  color: gray;
+  color: var(--placeholder);
 }
 .playbook__menu {
   flex: 1;
@@ -53,16 +72,16 @@ body.playbook__preview {
 .playbook__menu__item {
   display: block;
   padding: 5px 10px;
-  color: #212121;
+  color: var(--text);
   text-decoration: none;
   word-break: break-word;
 }
 .playbook__menu__item:hover {
-  color: blue;
+  color: var(--accent);
 }
 .playbook__menu__item.--select {
-  background: blue;
-  color: white;
+  background: var(--accent);
+  color: var(--theme);
 }
 .playbook__menu__item__last {
   font-weight: 500;
@@ -74,7 +93,7 @@ body.playbook__preview {
 }
 .playbook__toolbar {
   display: flex;
-  background: gainsboro;
+  background: var(--panel);
   min-height: 30px;
   align-items: center;
   box-sizing: border-box;
@@ -85,9 +104,10 @@ body.playbook__preview {
 }
 .playbook__button {
   appearance: none;
-  border: 1px solid black;
-  fill: black;
-  background: white;
+  color: var(--text);
+  fill: var(--text);
+  background: var(--theme);
+  border: 1px solid var(--text);
   outline: none;
   padding: 4px;
   min-height: 28px;
@@ -96,12 +116,12 @@ body.playbook__preview {
   box-sizing: border-box;
 }
 .playbook__button:hover {
-  color: blue;
-  fill: blue;
-  border-color: blue;
+  color: var(--accent);
+  fill: var(--accent);
+  border-color: var(--accent);
 }
 .playbook__button:focus {
-  border-color: blue;
+  border-color: var(--accent);
 }
 .playbook__button:active {
   transform: translateY(1px);
@@ -120,7 +140,7 @@ body.playbook__preview {
 }
 .playbook__content {
   display: flex;
-  border-bottom: 1px solid gainsboro;
+  border-bottom: 1px solid var(--border);
 }
 .playbook__content:last-child {
   flex: 1;
@@ -139,12 +159,12 @@ body.playbook__preview {
 .playbook__property {
   flex: 0 0 260px;
   box-sizing: border-box;
-  border-left: 1px solid gainsboro;
-  background: white;
+  border-left: 1px solid var(--border);
+  background: var(--theme);
+  color: var(--text);
   font-family: Roboto Mono, Consolas;
   font-size: 12px;
   word-break: break-word;
-  color: #212121;
   padding: 10px 5px 20px 10px;
 }
 .playbook__property__tag {
@@ -161,8 +181,8 @@ body.playbook__preview {
 }
 .playbook__error {
   display: inline-block;
-  background: #ffebee;
-  color: #f44336;
+  background: #F44336;
+  color: white;
   padding: 10px;
   font-family: Roboto, sans-serif;
   font-size: 14px;

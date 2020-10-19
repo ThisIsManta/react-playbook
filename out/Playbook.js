@@ -64,6 +64,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var lodash_1 = __importDefault(require("lodash"));
 var fuzzy_search_1 = __importDefault(require("fuzzy-search"));
+var PlaybookButton_1 = __importDefault(require("./PlaybookButton"));
 function classNames() {
     var classes = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -74,6 +75,10 @@ function classNames() {
 var previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''));
 if (previewPathName) {
     document.body.classList.add('playbook__preview');
+}
+var darkMode = window.localStorage.getItem('playbook__dark-mode') === 'true';
+if (darkMode) {
+    document.body.classList.add('playbook__dark-mode');
 }
 exports.default = react_1.default.memo(function (props) {
     var pages = react_1.useMemo(function () { return lodash_1.default.chain(props.pages)
@@ -107,6 +112,13 @@ function Playbook(props) {
     var _a = __read(react_1.useState(getSelectPage), 2), selectPage = _a[0], setSelectPage = _a[1];
     var _b = __read(react_1.useState(getSearchText), 2), searchText = _b[0], setSearchText = _b[1];
     react_1.useEffect(function () {
+        var firstPage = props.pages[0];
+        if (selectPage === undefined && firstPage) {
+            setQueryParams({ p: firstPage.name }, true);
+            setSelectPage(firstPage);
+        }
+    }, [props.pages]);
+    react_1.useEffect(function () {
         window.addEventListener('popstate', function () {
             setSelectPage(getSelectPage());
             setSearchText(getSearchText());
@@ -118,18 +130,14 @@ function Playbook(props) {
     var searcher = react_1.useMemo(function () { return new fuzzy_search_1.default(props.pages, ['name'], { caseSensitive: false, sort: true }); }, [props.pages]);
     var _c = __read(react_1.useState(false), 2), leftMenuVisible = _c[0], setLeftMenuVisible = _c[1];
     var _d = __read(react_1.useState(true), 2), propertyPanelVisible = _d[0], setPropertyPanelVisible = _d[1];
+    var onMenuItemClick = react_1.useCallback(function (pageName) {
+        setSelectPage(props.pages.find(function (page) { return page.name === pageName; }));
+        setQueryParams({ p: pageName }, false);
+        setLeftMenuVisible(false);
+    }, [props.pages]);
     var menus = react_1.useMemo(function () { return searcher.search(searchText).map(function (page) {
         var _a;
-        return (react_1.default.createElement("a", { key: page.name, className: classNames('playbook__menu__item', page.name === ((_a = selectPage) === null || _a === void 0 ? void 0 : _a.name) && '--select'), href: '?p=' + window.encodeURI(page.name), onClick: function (e) {
-                e.preventDefault();
-                setSelectPage(page);
-                setQueryParams({ p: page.name }, selectPage === undefined);
-                setLeftMenuVisible(false);
-            } }, page.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
-            ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
-            : react_1.default.createElement("span", { key: rank },
-                part,
-                "/")); })));
+        return (react_1.default.createElement(MenuItemMemoized, { name: page.name, selected: page.name === ((_a = selectPage) === null || _a === void 0 ? void 0 : _a.name), onClick: onMenuItemClick }));
     }); }, [searcher, searchText, selectPage]);
     return (react_1.default.createElement("div", { className: 'playbook' },
         react_1.default.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&family=Roboto+Mono:400,600&display=swap', rel: 'stylesheet' }),
@@ -149,7 +157,7 @@ function Playbook(props) {
             react_1.default.createElement("div", { className: 'playbook__menu' }, menus)),
         react_1.default.createElement("div", { className: 'playbook__right' },
             react_1.default.createElement("div", { className: 'playbook__toolbar' },
-                react_1.default.createElement(PlaybookButton, { id: 'playbook__side-menu-toggle', title: 'Open navigation menu', onClick: function () { setLeftMenuVisible(function (value) { return !value; }); } },
+                react_1.default.createElement(PlaybookButton_1.default, { id: 'playbook__side-menu-toggle', title: 'Open navigation menu', onClick: function () { setLeftMenuVisible(function (value) { return !value; }); } },
                     react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
                         react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
                         react_1.default.createElement("path", { d: "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" }))),
@@ -157,7 +165,22 @@ function Playbook(props) {
                     ? props.contentControl
                     : react_1.default.createElement(props.contentControl, null),
                 react_1.default.createElement("div", { style: { flex: '1 1 auto' } }),
-                react_1.default.createElement(PlaybookButton, { id: 'playbook__property-panel-toggle', title: propertyPanelVisible ? 'Hide property panel' : 'Show property panel', onClick: function () { setPropertyPanelVisible(function (value) { return !value; }); } }, propertyPanelVisible
+                react_1.default.createElement(PlaybookButton_1.default, { title: 'Toggle dark mode', onClick: function () {
+                        if (darkMode) {
+                            window.localStorage.removeItem('playbook__dark-mode');
+                        }
+                        else {
+                            window.localStorage.setItem('playbook__dark-mode', 'true');
+                        }
+                        window.location.reload();
+                    } }, darkMode
+                    ? react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
+                        react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
+                        react_1.default.createElement("path", { d: "M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" }))
+                    : react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
+                        react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
+                        react_1.default.createElement("path", { d: "M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z" }))),
+                react_1.default.createElement(PlaybookButton_1.default, { id: 'playbook__property-panel-toggle', title: propertyPanelVisible ? 'Hide property panel' : 'Show property panel', onClick: function () { setPropertyPanelVisible(function (value) { return !value; }); } }, propertyPanelVisible
                     ? react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" },
                         react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
                         react_1.default.createElement("path", { d: "M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" }))
@@ -165,6 +188,17 @@ function Playbook(props) {
                         react_1.default.createElement("path", { d: "M0 0h24v24H0z", fill: "none" }),
                         react_1.default.createElement("path", { d: "M23 21.74l-1.46-1.46L7.21 5.95 3.25 1.99 1.99 3.25l2.7 2.7h-.64c-1.11 0-1.99.89-1.99 2l-.01 11c0 1.11.89 2 2 2h15.64L21.74 23 23 21.74zM22 7.95c.05-1.11-.84-2-1.95-1.95h-4V3.95c0-1.11-.89-2-2-1.95h-4c-1.11-.05-2 .84-2 1.95v.32l13.95 14V7.95zM14.05 6H10V3.95h4.05V6z" })))),
             react_1.default.createElement("div", { className: 'playbook__contents' }, selectPage && (react_1.default.createElement(ContentsMemoized, { page: selectPage, propertyPanelVisible: propertyPanelVisible }))))));
+}
+var MenuItemMemoized = react_1.default.memo(MenuItem);
+function MenuItem(props) {
+    return (react_1.default.createElement("a", { className: classNames('playbook__menu__item', props.selected && '--select'), href: '?p=' + window.encodeURI(props.name), onClick: function (e) {
+            e.preventDefault();
+            props.onClick(props.name);
+        } }, props.name.split('/').map(function (part, rank, list) { return (rank === list.length - 1
+        ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
+        : react_1.default.createElement("span", { key: rank },
+            part,
+            "/")); })));
 }
 var ContentsMemoized = react_1.default.memo(Contents);
 function Contents(props) {
@@ -184,17 +218,13 @@ function Contents(props) {
                             e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
                         }
                     } }),
-                react_1.default.createElement(PlaybookButton, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: function () { window.open(link, '_blank'); } },
+                react_1.default.createElement(PlaybookButton_1.default, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: function () { window.open(link, '_blank'); } },
                     react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", viewBox: "0 0 24 24" },
                         react_1.default.createElement("rect", { fill: "none", height: "24", width: "24" }),
                         react_1.default.createElement("path", { d: "M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" })))),
             props.propertyPanelVisible && (react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } }))));
     })));
 }
-function PlaybookButton(props) {
-    return react_1.default.createElement("button", __assign({ className: 'playbook__button' }, props));
-}
-exports.PlaybookButton = PlaybookButton;
 function getReactChildren(element) {
     if (lodash_1.default.isArray(element)) {
         return Δ(element);
