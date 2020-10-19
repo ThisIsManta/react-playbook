@@ -3,10 +3,30 @@
 @content-property-width: 260px;
 @content-z-index: 0;
 
+:root {
+  --theme: white;
+  --panel: gainsboro;
+  --border: gainsboro;
+  --text: #212121;
+  --placeholder: gray;
+  --accent: #0336FF;
+}
+
+.playbook__dark-mode {
+  --theme: black;
+  --panel: #212121;
+  --border: #212121;
+  --text: #FAFAFA;
+  --placeholder: #9E9E9E;
+  --accent: #FFDE03;
+}
+
 body {
   margin: 0;
   width: 100vw;
   height: 100vh;
+  background: var(--theme);
+  color: var(--text);
 
   &.playbook__preview {
     width: auto;
@@ -27,7 +47,7 @@ body {
   width: @left-side-width;
   flex: 0 0 auto;
   transition: width 0.3s ease-out;
-  background: gainsboro;
+  background: var(--panel);
   box-sizing: border-box;
   user-select: none;
   display: flex;
@@ -47,11 +67,12 @@ body {
   font-size: 14px;
   border: none;
   outline: none;
-  border-right: 1px solid gainsboro;
-  color: #212121;
+  border-right: 1px solid var(--border);
+  background: var(--theme);
+  color: var(--text);
 
   &::placeholder {
-    color: gray;
+    color: var(--placeholder);
   }
 }
 
@@ -65,17 +86,17 @@ body {
 .playbook__menu__item {
   display: block;
   padding: 5px 10px;
-  color: #212121;
+  color: var(--text);
   text-decoration: none;
   word-break: break-word;
 
   &:hover {
-    color: blue;
+    color: var(--accent);
   }
 
   &.--select {
-    background: blue;
-    color: white;
+    background: var(--accent);
+    color: var(--theme);
   }
 }
 
@@ -91,7 +112,7 @@ body {
 
 .playbook__toolbar {
   display: flex;
-  background: gainsboro;
+  background: var(--panel);
   min-height: 30px;
   align-items: center;
   box-sizing: border-box;
@@ -104,9 +125,10 @@ body {
 
 .playbook__button {
   appearance: none;
-  border: 1px solid black;
-  fill: black;
-  background: white;
+  color: var(--text);
+  fill: var(--text); // For <svg>
+  background: var(--theme);
+  border: 1px solid var(--text);
   outline: none;
   padding: 4px;
   min-height: 28px;
@@ -115,13 +137,13 @@ body {
   box-sizing: border-box;
 
   &:hover {
-    color: blue;
-    fill: blue; // For <svg>
-    border-color: blue;
+    color: var(--accent);
+    fill: var(--accent); // For <svg>
+    border-color: var(--accent);
   }
 
   &:focus {
-    border-color: blue;
+    border-color: var(--accent);
   }
 
   &:active {
@@ -145,7 +167,7 @@ body {
 
 .playbook__content {
   display: flex;
-  border-bottom: 1px solid gainsboro;
+  border-bottom: 1px solid var(--border);
 
   &:last-child {
     flex: 1;
@@ -168,12 +190,12 @@ body {
 .playbook__property {
   flex: 0 0 @content-property-width;
   box-sizing: border-box;
-  border-left: 1px solid gainsboro;
-  background: white;
+  border-left: 1px solid var(--border);
+  background: var(--theme);
+  color: var(--text);
   font-family: Roboto Mono, Consolas;
   font-size: 12px;
   word-break: break-word;
-  color: #212121;
   padding: 10px 5px 20px 10px;
 }
 
@@ -195,8 +217,8 @@ body {
 
 .playbook__error {
   display: inline-block;
-  background: #ffebee;
-  color: #f44336;
+  background: #F44336;
+  color: white;
   padding: 10px;
   font-family: Roboto, sans-serif;
   font-size: 14px;
