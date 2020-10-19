@@ -77,6 +77,14 @@ function Playbook(props: Props) {
 	const [searchText, setSearchText] = useState(getSearchText)
 
 	useEffect(() => {
+		const firstPage = props.pages[0]
+		if (selectPage === undefined && firstPage) {
+			setQueryParams({ p: firstPage.name }, true)
+			setSelectPage(firstPage)
+		}
+	}, [props.pages])
+
+	useEffect(() => {
 		window.addEventListener('popstate', () => {
 			setSelectPage(getSelectPage())
 			setSearchText(getSearchText())
@@ -97,29 +105,19 @@ function Playbook(props: Props) {
 
 	const [propertyPanelVisible, setPropertyPanelVisible] = useState(true)
 
+	const onMenuItemClick = useCallback((pageName: string) => {
+		setSelectPage(props.pages.find(page => page.name === pageName))
+		setQueryParams({ p: pageName }, false)
+		setLeftMenuVisible(false)
+	}, [props.pages])
+
 	const menus = useMemo(
 		() => searcher.search(searchText).map(page => (
-			<a
-				key={page.name}
-				className={classNames(
-					'playbook__menu__item',
-					page.name === selectPage?.name && '--select',
-				)}
-				href={'?p=' + window.encodeURI(page.name)}
-				onClick={e => {
-					// Avoid re-rendering the whole page for performance while allow users to copy the links
-					e.preventDefault()
-					setSelectPage(page)
-					setQueryParams({ p: page.name }, selectPage === undefined)
-					setLeftMenuVisible(false)
-				}}
-			>
-				{page.name.split('/').map((part, rank, list) => (
-					rank === list.length - 1
-						? <span key={rank} className='playbook__menu__item__last'>{part}</span>
-						: <span key={rank}>{part}/</span>
-				))}
-			</a>
+			<MenuItemMemoized
+				name={page.name}
+				selected={page.name === selectPage?.name}
+				onClick={onMenuItemClick}
+			/>
 		)),
 		[searcher, searchText, selectPage],
 	)
@@ -194,6 +192,31 @@ function Playbook(props: Props) {
 				</div>
 			</div>
 		</div>
+	)
+}
+
+const MenuItemMemoized = React.memo(MenuItem)
+
+function MenuItem(props: { name: string, selected: boolean, onClick: (name: string) => void }) {
+	return (
+		<a
+			className={classNames(
+				'playbook__menu__item',
+				props.selected && '--select',
+			)}
+			href={'?p=' + window.encodeURI(props.name)}
+			onClick={e => {
+				// Avoid re-rendering the whole page for performance while allow users to copy the links
+				e.preventDefault()
+				props.onClick(props.name)
+			}}
+		>
+			{props.name.split('/').map((part, rank, list) => (
+				rank === list.length - 1
+					? <span key={rank} className='playbook__menu__item__last'>{part}</span>
+					: <span key={rank}>{part}/</span>
+			))}
+		</a>
 	)
 }
 
