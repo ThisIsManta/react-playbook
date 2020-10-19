@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Playbook, { PlaybookButton } from './Playbook'
+import Playbook from './Playbook'
+import PlaybookButton from './PlaybookButton'
 import './Playbook.less'
 
 ReactDOM.render(

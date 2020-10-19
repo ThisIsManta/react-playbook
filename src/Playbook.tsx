@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import _ from 'lodash'
 import FuzzySearch from 'fuzzy-search'
 
+import PlaybookButton from './PlaybookButton'
+
 function classNames(...classes: Array<any>) {
 	return _.compact(classes).join(' ')
 }
@@ -272,10 +274,6 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 			})}
 		</React.Fragment>
 	)
-}
-
-export function PlaybookButton(props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>) {
-	return <button className='playbook__button' {...props} />
 }
 
 export function getReactChildren(element: React.ReactFragment): Array<React.ReactElement> {
