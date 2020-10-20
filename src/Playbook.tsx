@@ -71,7 +71,7 @@ export default React.memo((props: Props) => {
 
 	return (
 		<ErrorBoundary>
-			<Playbook {...props} />
+			<Playbook {...props} pages={pages} />
 		</ErrorBoundary>
 	)
 })
