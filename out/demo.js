@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importDefault(require("react"));
 var react_dom_1 = __importDefault(require("react-dom"));
 var Playbook_1 = __importDefault(require("./Playbook"));
-var PlaybookButton_1 = __importDefault(require("./PlaybookButton"));
 require("./Playbook.less");
 react_dom_1.default.render(react_1.default.createElement(Playbook_1.default, { pages: [
         {
@@ -17,11 +16,12 @@ react_dom_1.default.render(react_1.default.createElement(Playbook_1.default, { p
         },
         {
             name: 'input',
-            content: (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement("input", null),
-                react_1.default.createElement("input", { disabled: true })))
+            content: {
+                'default': react_1.default.createElement("input", null),
+                'disabled': react_1.default.createElement("input", { disabled: true }),
+            }
         }
-    ], contentWrapper: ContentWrapper, contentControl: react_1.default.createElement(PlaybookButton_1.default, null, "Dummy") }), document.getElementById('root'));
+    ], contentWrapper: ContentWrapper, contentControl: react_1.default.createElement(Playbook_1.default.Button, null, " Dummy") }), document.getElementById('root'));
 function ContentWrapper(props) {
     return react_1.default.createElement("main", null, props.children);
 }
