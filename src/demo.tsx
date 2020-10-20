@@ -18,16 +18,14 @@ ReactDOM.render(
 			},
 			{
 				name: 'input',
-				content: (
-					<React.Fragment>
-						<input />
-						<input disabled />
-					</React.Fragment>
-				)
+				content: {
+					'default': <input />,
+					'disabled': <input disabled />,
+				}
 			}
 		]}
 		contentWrapper={ContentWrapper}
-		contentControl={<Playbook.Button>Dummy</Playbook.Button>}
+		contentControl={< Playbook.Button > Dummy</Playbook.Button >}
 	/>,
 	document.getElementById('root'),
 )

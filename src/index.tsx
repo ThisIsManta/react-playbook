@@ -1,4 +1,4 @@
-export { default as Playbook, IPlaybookPage, getReactChildren } from './Playbook'
+export { default as Playbook, IPlaybookPage, getElements } from './Playbook'
 export * from './PlaybookState'
 export { default as flattenObject } from './flattenObject'
 export * from './StorybookAdapter'

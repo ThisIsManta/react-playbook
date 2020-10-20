@@ -8,7 +8,7 @@ function classNames(...classes: Array<any>) {
 
 export interface IPlaybookPage {
 	name: string
-	content: React.ReactFragment
+	content: React.ReactFragment | { [caption: string]: React.ReactElement }
 }
 
 type Props = {
@@ -49,25 +49,26 @@ const Playbook: IPlaybook = function Playbook(props: Props) {
 			return null
 		}
 
-		const elements = getReactChildren(page.content)
+		const elements = getElements(page.content)
 
 		if (elements.length === 0) {
 			return null
 		}
 
-		const index = window.location.hash.replace(/^#/, '') || '0'
+		const index = parseInt(window.location.hash.replace(/^#/, '')) || 0
 		const element = elements[index]
 
 		if (!element) {
 			return null
 		}
 
+		const ContentWrapper = props.contentWrapper || PassThroughContentWrapper
+
 		return (
 			<ErrorBoundary>
-				{props.contentWrapper
-					? <props.contentWrapper>{element}</props.contentWrapper>
-					: element
-				}
+				<ContentWrapper>
+					{element.element}
+				</ContentWrapper>
 			</ErrorBoundary>
 		)
 	}
@@ -115,7 +116,15 @@ function Index(props: Props) {
 	// Only for responsive view
 	const [leftMenuVisible, setLeftMenuVisible] = useState(false)
 
-	const [propertyPanelVisible, setPropertyPanelVisible] = useState(true)
+	const [propertyPanelVisible, setPropertyPanelVisible] = useState(() => (window.sessionStorage.getItem('playbook__property-panel-visible') ?? 'true') === 'true')
+
+	useEffect(() => {
+		if (propertyPanelVisible) {
+			window.sessionStorage.setItem('playbook__property-panel-visible', 'true')
+		} else {
+			window.sessionStorage.removeItem('playbook__property-panel-visible')
+		}
+	}, [propertyPanelVisible])
 
 	const onMenuItemClick = useCallback((pageName: string) => {
 		setSelectPage(props.pages.find(page => page.name === pageName))
@@ -126,6 +135,7 @@ function Index(props: Props) {
 	const menus = useMemo(
 		() => searcher.search(searchText).map(page => (
 			<MenuItemMemoized
+				key={page.name}
 				name={page.name}
 				selected={page.name === selectPage?.name}
 				onClick={onMenuItemClick}
@@ -240,10 +250,12 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 				props.onClick(props.name)
 			}}
 		>
-			{props.name.split('/').map((part, rank, list) => (
-				rank === list.length - 1
-					? <span key={rank} className='playbook__menu__item__last'>{part}</span>
-					: <span key={rank}>{part}/</span>
+			{props.name.split(/\\|\//).map((part, rank, list) => (
+				<span
+					key={rank}
+					className={classNames(rank === list.length - 1 && 'playbook__menu__item__last')}>
+					{part}
+				</span>
 			))}
 		</a>
 	)
@@ -252,7 +264,7 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 const ContentsMemoized = React.memo(Contents)
 
 function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean }) {
-	const elements = getReactChildren(props.page.content)
+	const elements = getElements(props.page.content)
 
 	if (elements.length === 0) {
 		return (
@@ -264,38 +276,44 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 
 	return (
 		<React.Fragment>
-			{elements.map((element, index) => {
+			{elements.map(({ caption, element }, index) => {
 				const link = '/' + window.encodeURI(props.page.name) + '#' + index
 
 				return (
-					<section key={props.page.name + '#' + index} className='playbook__content'>
-						<div className='playbook__content-container'>
-							<iframe
-								data-playbook-content={true}
-								src={link}
-								width='100%'
-								frameBorder='0'
-								scrolling='no'
-								onLoad={(e) => {
-									if (e.currentTarget.contentWindow) {
-										e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-									}
-								}}
-							/>
-							<Button
-								id='playbook__new-window'
-								title='Open in a new tab'
-								onClick={() => { window.open(link, '_blank') }}
-							>
-								<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24">
-									<rect fill="none" height="24" width="24" />
-									<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
-								</svg>
-							</Button>
+					<section key={props.page.name + '#' + index}>
+						{caption && <header className='playbook__content-caption'>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='playbook__content-caption__icon'><path d="M0 0h24v24H0V0z" fill="none" /><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" /></svg>
+							{caption}
+						</header>}
+						<div className='playbook__content'>
+							<div className='playbook__content-container'>
+								<iframe
+									data-playbook-content={true}
+									src={link}
+									width='100%'
+									frameBorder='0'
+									scrolling='no'
+									onLoad={(e) => {
+										if (e.currentTarget.contentWindow) {
+											e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
+										}
+									}}
+								/>
+								<Button
+									id='playbook__new-window'
+									title='Open in a new tab'
+									onClick={() => { window.open(link, '_blank') }}
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24">
+										<rect fill="none" height="24" width="24" />
+										<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
+									</svg>
+								</Button>
+							</div>
+							{props.propertyPanelVisible && (
+								<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
+							)}
 						</div>
-						{props.propertyPanelVisible && (
-							<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
-						)}
 					</section>
 				)
 			})}
@@ -303,18 +321,22 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 	)
 }
 
+function PassThroughContentWrapper(props: { children: React.ReactElement }) {
+	return props.children
+}
+
 function Button(props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>) {
 	return <button className='playbook__button' {...props} />
 }
 
-export function getReactChildren(element: React.ReactFragment): Array<React.ReactElement> {
-	if (_.isArray(element)) {
-		return Δ(element)
+export function getElements(content: IPlaybookPage['content']): Array<{ caption?: string, element: React.ReactElement }> {
+	if (_.isArray(content)) {
+		return Δ(content)
 	}
 
-	if (React.isValidElement(element)) {
-		if (element.type === React.Fragment) {
-			const fragment = element as React.ReactElement<{ children: React.ReactNode | React.ReactNodeArray }>
+	if (React.isValidElement(content)) {
+		if (content.type === React.Fragment) {
+			const fragment = content as React.ReactElement<{ children: React.ReactNode | React.ReactNodeArray }>
 			if (_.isArray(fragment.props.children)) {
 				return Δ(fragment.props.children)
 			} else {
@@ -322,14 +344,20 @@ export function getReactChildren(element: React.ReactFragment): Array<React.Reac
 			}
 		}
 
-		return [element]
+		return [{ element: content }]
+	}
+
+	if (_.isPlainObject(content)) {
+		return _.toPairs(content)
+			.filter(([, element]) => React.isValidElement(element))
+			.map(([caption, element]) => ({ caption, element }))
 	}
 
 	return []
 }
 
 function Δ(elements: React.ReactNodeArray) {
-	return elements.filter(React.isValidElement)
+	return elements.filter(React.isValidElement).map(element => ({ element }))
 }
 
 // TODO: convert this to a React component
