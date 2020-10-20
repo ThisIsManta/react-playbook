@@ -2,8 +2,6 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import _ from 'lodash'
 import FuzzySearch from 'fuzzy-search'
 
-import PlaybookButton from './PlaybookButton'
-
 function classNames(...classes: Array<any>) {
 	return _.compact(classes).join(' ')
 }
@@ -19,6 +17,11 @@ type Props = {
 	contentWrapper?: React.ComponentType<{ children: React.ReactElement }>
 }
 
+interface IPlaybook {
+	(props: Props): React.ReactElement | null
+	Button: typeof Button
+}
+
 const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''))
 
 if (previewPathName) {
@@ -30,7 +33,7 @@ if (darkMode) {
 	document.body.classList.add('playbook__dark-mode')
 }
 
-export default React.memo((props: Props) => {
+const Playbook: IPlaybook = function Playbook(props: Props) {
 	const pages = useMemo(
 		() => _.chain(props.pages)
 			.uniqBy(page => page.name)
@@ -71,12 +74,14 @@ export default React.memo((props: Props) => {
 
 	return (
 		<ErrorBoundary>
-			<Playbook {...props} pages={pages} />
+			<Index {...props} pages={pages} />
 		</ErrorBoundary>
 	)
-})
+}
 
-function Playbook(props: Props) {
+Playbook.Button = Button
+
+function Index(props: Props) {
 	const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages])
 	const getSearchText = useCallback(() => getQueryParams()['q'] || '', [])
 
@@ -165,7 +170,7 @@ function Playbook(props: Props) {
 			</div>
 			<div className='playbook__right'>
 				<div className='playbook__toolbar'>
-					<PlaybookButton
+					<Button
 						id='playbook__side-menu-toggle'
 						title='Open navigation menu'
 						onClick={() => { setLeftMenuVisible(value => !value) }}
@@ -174,12 +179,12 @@ function Playbook(props: Props) {
 							<path d="M0 0h24v24H0z" fill="none" />
 							<path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
 						</svg>
-					</PlaybookButton>
+					</Button>
 					{React.isValidElement(props.contentControl) || !props.contentControl
 						? props.contentControl
 						: <props.contentControl />}
 					<div style={{ flex: '1 1 auto' }} />
-					<PlaybookButton
+					<Button
 						title='Toggle dark mode'
 						onClick={() => {
 							if (darkMode) {
@@ -195,8 +200,8 @@ function Playbook(props: Props) {
 							? <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ><path d="M0 0h24v24H0z" fill="none" /><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" /></svg>
 							: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z" /></svg>
 						}
-					</PlaybookButton>
-					<PlaybookButton
+					</Button>
+					<Button
 						id='playbook__property-panel-toggle'
 						title={propertyPanelVisible ? 'Hide property panel' : 'Show property panel'}
 						onClick={() => { setPropertyPanelVisible(value => !value) }}
@@ -204,7 +209,7 @@ function Playbook(props: Props) {
 						{propertyPanelVisible
 							? <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" /></svg>
 							: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M23 21.74l-1.46-1.46L7.21 5.95 3.25 1.99 1.99 3.25l2.7 2.7h-.64c-1.11 0-1.99.89-1.99 2l-.01 11c0 1.11.89 2 2 2h15.64L21.74 23 23 21.74zM22 7.95c.05-1.11-.84-2-1.95-1.95h-4V3.95c0-1.11-.89-2-2-1.95h-4c-1.11-.05-2 .84-2 1.95v.32l13.95 14V7.95zM14.05 6H10V3.95h4.05V6z" /></svg>}
-					</PlaybookButton>
+					</Button>
 				</div>
 				<div className='playbook__contents'>
 					{selectPage && (
@@ -277,7 +282,7 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 									}
 								}}
 							/>
-							<PlaybookButton
+							<Button
 								id='playbook__new-window'
 								title='Open in a new tab'
 								onClick={() => { window.open(link, '_blank') }}
@@ -286,7 +291,7 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 									<rect fill="none" height="24" width="24" />
 									<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
 								</svg>
-							</PlaybookButton>
+							</Button>
 						</div>
 						{props.propertyPanelVisible && (
 							<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
@@ -296,6 +301,10 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 			})}
 		</React.Fragment>
 	)
+}
+
+function Button(props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>) {
+	return <button className='playbook__button' {...props} />
 }
 
 export function getReactChildren(element: React.ReactFragment): Array<React.ReactElement> {
@@ -527,3 +536,5 @@ function setQueryParams(params: { [key: string]: string | undefined }, replace: 
 		window.history.pushState(null, '', link)
 	}
 }
+
+export default Playbook
