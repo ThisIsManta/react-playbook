@@ -151,6 +151,9 @@ body.playbook__preview {
   flex: 1 0 auto;
   z-index: 0;
 }
+.playbook__content-container iframe {
+  display: block;
+}
 #playbook__new-window {
   position: absolute;
   top: 10px;
@@ -174,7 +177,7 @@ body.playbook__preview {
   margin-left: 16px;
 }
 .playbook__property__indent .playbook__property__indent:hover {
-  background: gainsboro;
+  background: var(--panel);
 }
 .playbook__property__function {
   font-style: italic;

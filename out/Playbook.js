@@ -104,7 +104,7 @@ exports.default = react_1.default.memo(function (props) {
             : element));
     }
     return (react_1.default.createElement(ErrorBoundary, null,
-        react_1.default.createElement(Playbook, __assign({}, props))));
+        react_1.default.createElement(Playbook, __assign({}, props, { pages: pages }))));
 });
 function Playbook(props) {
     var getSelectPage = react_1.useCallback(function () { return props.pages.find(function (page) { return page.name === getQueryParams()['p']; }); }, [props.pages]);
