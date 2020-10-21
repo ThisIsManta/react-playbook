@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import _ from 'lodash'
 import FuzzySearch from 'fuzzy-search'
 
@@ -261,7 +261,10 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 
 const ContentsMemoized = React.memo(Contents)
 
-function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean }) {
+function Contents(props: {
+	page: IPlaybookPage,
+	propertyPanelVisible: boolean,
+}) {
 	const elements = getElements(props.page.content)
 
 	if (elements.length === 0) {
@@ -274,53 +277,87 @@ function Contents(props: { page: IPlaybookPage, propertyPanelVisible: boolean })
 
 	return (
 		<React.Fragment>
-			{elements.map(({ caption, element }, index) => {
-				const link = '/' + window.encodeURI(props.page.name) + '#' + index
-
-				return (
-					<section key={props.page.name + '#' + index}>
-						{caption && <header className='playbook__content-caption'>
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='playbook__content-caption__icon'><path d="M0 0h24v24H0V0z" fill="none" /><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" /></svg>
-							{caption}
-						</header>}
-						<div className='playbook__content'>
-							<div className='playbook__content-container'>
-								<iframe
-									data-playbook-content={true}
-									src={link}
-									width='100%'
-									frameBorder='0'
-									scrolling='no'
-									onLoad={(e) => {
-										if (e.currentTarget.contentWindow) {
-											e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-										}
-									}}
-								/>
-								<Button
-									id='playbook__new-window'
-									title='Open in a new tab'
-									onClick={() => { window.open(link, '_blank') }}
-								>
-									<svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24">
-										<rect fill="none" height="24" width="24" />
-										<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
-									</svg>
-								</Button>
-							</div>
-							{props.propertyPanelVisible && (
-								<div className='playbook__property' dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }} />
-							)}
-						</div>
-					</section>
-				)
-			})}
+			{elements.map(({ caption, element }, index) => (
+				<Content
+					key={props.page.name + '#' + index}
+					link={'/' + window.encodeURI(props.page.name) + '#' + index}
+					caption={caption}
+					element={element}
+					propertyPanelVisible={props.propertyPanelVisible}
+				/>
+			))}
 		</React.Fragment>
 	)
 }
 
 function PassThroughContentWrapper(props: { children: React.ReactElement }) {
 	return props.children
+}
+
+const minimumPropertyPanelHeight = 45 // Represent total height of `playbook__property` with a single line text
+
+function Content(props: {
+	link: string
+	caption: string | undefined,
+	element: React.ReactElement,
+	propertyPanelVisible: boolean,
+}) {
+	const propertyPanel = useRef<HTMLDivElement>(null)
+
+	return (
+		<section>
+			{props.caption && <header className='playbook__content-caption'>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='playbook__content-caption__icon'><path d="M0 0h24v24H0V0z" fill="none" /><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" /></svg>
+				{props.caption}
+			</header>}
+			<div className='playbook__content-container'>
+				<div className='playbook__content-preview'>
+					<iframe
+						data-playbook-content={true}
+						src={props.link}
+						width='100%'
+						height={minimumPropertyPanelHeight + 'px'}
+						frameBorder='0'
+						scrolling='no'
+						onLoad={(e) => {
+							const w = e.currentTarget.contentWindow
+							if (w) {
+								const actualContentHeight = w.document.body.clientHeight
+
+								const expectedFrameHeight = actualContentHeight <= 40
+									? Math.round(window.innerHeight * 0.8)
+									: w.document.documentElement.scrollHeight
+
+								const propertyPanelHeight = propertyPanel.current?.clientHeight ?? 0
+
+								e.currentTarget.style.height = Math.max(expectedFrameHeight, propertyPanelHeight) + 'px'
+
+								e.currentTarget.setAttribute('scrolling', 'auto')
+							}
+						}}
+					/>
+					<Button
+						id='playbook__new-window'
+						title='Open in a new tab'
+						onClick={() => { window.open(props.link, '_blank') }}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24">
+							<rect fill="none" height="24" width="24" />
+							<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
+						</svg>
+					</Button>
+				</div>
+				<div
+					className={classNames(
+						'playbook__property',
+						props.propertyPanelVisible && 'playbook__property__hidden',
+					)}
+					ref={propertyPanel}
+					dangerouslySetInnerHTML={{ __html: getNodeHTML(props.element) }}
+				/>
+			</div>
+		</section>
+	)
 }
 
 function Button(props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>) {
