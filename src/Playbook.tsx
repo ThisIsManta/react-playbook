@@ -251,11 +251,9 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 			}}
 		>
 			{props.name.split(/\\|\//).map((part, rank, list) => (
-				<span
-					key={rank}
-					className={classNames(rank === list.length - 1 && 'playbook__menu__item__last')}>
-					{part}
-				</span>
+				rank === list.length - 1
+					? <span key={rank} className='playbook__menu__item__last'>{part}</span>
+					: <span key={rank}>{part}/</span>
 			))}
 		</a>
 	)
