@@ -60,7 +60,7 @@ body.playbook__preview {
 }
 .playbook__menu {
   flex: 1;
-  padding: 7px 0;
+  padding-bottom: 10px;
   overflow-x: hidden;
   overflow-y: auto;
   background: var(--panel);
@@ -131,7 +131,7 @@ body.playbook__preview {
 .playbook__contents {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
   background: var(--theme);
@@ -140,7 +140,7 @@ body.playbook__preview {
   display: flex;
   flex-direction: column;
 }
-.playbook__contents > *:last-child {
+.playbook__contents > *:only-child {
   flex: 1 0 auto;
   border-bottom: none;
 }
@@ -157,17 +157,18 @@ body.playbook__preview {
   margin-right: 5px;
   fill: var(--text);
 }
-.playbook__content {
+.playbook__content-container {
   flex: 1 0 auto;
   display: flex;
   border-bottom: 1px solid var(--panel);
+  box-sizing: border-box;
 }
-.playbook__content-container {
+.playbook__content-preview {
   position: relative;
   flex: 1 0 auto;
   z-index: 0;
 }
-.playbook__content-container iframe {
+.playbook__content-preview iframe {
   display: block;
 }
 #playbook__new-window {
@@ -185,6 +186,10 @@ body.playbook__preview {
   font-size: 12px;
   word-break: break-word;
   padding: 10px 5px 20px 10px;
+}
+.playbook__property__hidden {
+  visibility: hidden;
+  position: absolute;
 }
 .playbook__property__tag {
   font-weight: 600;

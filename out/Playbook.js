@@ -202,7 +202,11 @@ function MenuItem(props) {
     return (react_1.default.createElement("a", { className: classNames('playbook__menu__item', props.selected && '--select'), href: '?p=' + window.encodeURI(props.name), onClick: function (e) {
             e.preventDefault();
             props.onClick(props.name);
-        } }, props.name.split(/\\|\//).map(function (part, rank, list) { return (react_1.default.createElement("span", { key: rank, className: classNames(rank === list.length - 1 && 'playbook__menu__item__last') }, part)); })));
+        } }, props.name.split(/\\|\//).map(function (part, rank, list) { return (rank === list.length - 1
+        ? react_1.default.createElement("span", { key: rank, className: 'playbook__menu__item__last' }, part)
+        : react_1.default.createElement("span", { key: rank },
+            part,
+            "/")); })));
 }
 var ContentsMemoized = react_1.default.memo(Contents);
 function Contents(props) {
@@ -215,29 +219,41 @@ function Contents(props) {
     }
     return (react_1.default.createElement(react_1.default.Fragment, null, elements.map(function (_a, index) {
         var caption = _a.caption, element = _a.element;
-        var link = '/' + window.encodeURI(props.page.name) + '#' + index;
-        return (react_1.default.createElement("section", { key: props.page.name + '#' + index },
-            caption && react_1.default.createElement("header", { className: 'playbook__content-caption' },
-                react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", className: 'playbook__content-caption__icon' },
-                    react_1.default.createElement("path", { d: "M0 0h24v24H0V0z", fill: "none" }),
-                    react_1.default.createElement("path", { d: "M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" })),
-                caption),
-            react_1.default.createElement("div", { className: 'playbook__content' },
-                react_1.default.createElement("div", { className: 'playbook__content-container' },
-                    react_1.default.createElement("iframe", { "data-playbook-content": true, src: link, width: '100%', frameBorder: '0', scrolling: 'no', onLoad: function (e) {
-                            if (e.currentTarget.contentWindow) {
-                                e.currentTarget.style.height = e.currentTarget.contentWindow.document.documentElement.scrollHeight + 'px';
-                            }
-                        } }),
-                    react_1.default.createElement(Button, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: function () { window.open(link, '_blank'); } },
-                        react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", enableBackground: "new 0 0 24 24", viewBox: "0 0 24 24" },
-                            react_1.default.createElement("rect", { fill: "none", height: "24", width: "24" }),
-                            react_1.default.createElement("path", { d: "M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" })))),
-                props.propertyPanelVisible && (react_1.default.createElement("div", { className: 'playbook__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } })))));
+        return (react_1.default.createElement(Content, { key: props.page.name + '#' + index, link: '/' + window.encodeURI(props.page.name) + '#' + index, caption: caption, element: element, propertyPanelVisible: props.propertyPanelVisible }));
     })));
 }
 function PassThroughContentWrapper(props) {
     return props.children;
+}
+var minimumPropertyPanelHeight = 45;
+function Content(props) {
+    var propertyPanel = react_1.useRef(null);
+    return (react_1.default.createElement("section", null,
+        props.caption && react_1.default.createElement("header", { className: 'playbook__content-caption' },
+            react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", className: 'playbook__content-caption__icon' },
+                react_1.default.createElement("path", { d: "M0 0h24v24H0V0z", fill: "none" }),
+                react_1.default.createElement("path", { d: "M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" })),
+            props.caption),
+        react_1.default.createElement("div", { className: 'playbook__content-container' },
+            react_1.default.createElement("div", { className: 'playbook__content-preview' },
+                react_1.default.createElement("iframe", { "data-playbook-content": true, src: props.link, width: '100%', height: minimumPropertyPanelHeight + 'px', frameBorder: '0', scrolling: 'no', onLoad: function (e) {
+                        var _a, _b;
+                        var w = e.currentTarget.contentWindow;
+                        if (w) {
+                            var actualContentHeight = w.document.body.clientHeight;
+                            var expectedFrameHeight = actualContentHeight <= 40
+                                ? Math.round(window.innerHeight * 0.8)
+                                : w.document.documentElement.scrollHeight;
+                            var propertyPanelHeight = (_b = (_a = propertyPanel.current) === null || _a === void 0 ? void 0 : _a.clientHeight, (_b !== null && _b !== void 0 ? _b : 0));
+                            e.currentTarget.style.height = Math.max(expectedFrameHeight, propertyPanelHeight) + 'px';
+                            e.currentTarget.setAttribute('scrolling', 'auto');
+                        }
+                    } }),
+                react_1.default.createElement(Button, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: function () { window.open(props.link, '_blank'); } },
+                    react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", enableBackground: "new 0 0 24 24", viewBox: "0 0 24 24" },
+                        react_1.default.createElement("rect", { fill: "none", height: "24", width: "24" }),
+                        react_1.default.createElement("path", { d: "M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" })))),
+            react_1.default.createElement("div", { className: classNames('playbook__property', props.propertyPanelVisible && 'playbook__property__hidden'), ref: propertyPanel, dangerouslySetInnerHTML: { __html: getNodeHTML(props.element) } }))));
 }
 function Button(props) {
     return react_1.default.createElement("button", __assign({ className: 'playbook__button' }, props));
