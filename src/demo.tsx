@@ -31,5 +31,5 @@ ReactDOM.render(
 )
 
 function ContentWrapper(props: { children: React.ReactElement }) {
-	return <main>{props.children}</main>
+	return <div>{props.children}</div>
 }

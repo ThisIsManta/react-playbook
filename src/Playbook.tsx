@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import _ from 'lodash'
-import FuzzySearch from 'fuzzy-search'
+import FuzzySearch from './FuzzySearch'
 
 function classNames(...classes: Array<any>) {
 	return _.compact(classes).join(' ')
@@ -43,7 +43,7 @@ const Playbook: IPlaybook = function Playbook(props: Props) {
 	)
 
 	if (previewPathName) {
-		const page = pages.find(page => page.name === previewPathName)
+		const page = _.find(pages, page => page.name === previewPathName)
 
 		if (!page) {
 			return null
@@ -83,7 +83,7 @@ const Playbook: IPlaybook = function Playbook(props: Props) {
 Playbook.Button = Button
 
 function Index(props: Props) {
-	const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages])
+	const getSelectPage = useCallback(() => _.find(props.pages, page => page.name === getQueryParams()['p']), [props.pages])
 	const getSearchText = useCallback(() => getQueryParams()['q'] || '', [])
 
 	const [selectPage, setSelectPage] = useState(getSelectPage)
@@ -305,7 +305,7 @@ function Content(props: {
 	const propertyPanel = useRef<HTMLDivElement>(null)
 
 	return (
-		<section>
+		<div>
 			{props.caption && <header className='playbook__content-caption'>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='playbook__content-caption__icon'><path d="M0 0h24v24H0V0z" fill="none" /><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" /></svg>
 				{props.caption}
@@ -356,7 +356,7 @@ function Content(props: {
 					dangerouslySetInnerHTML={{ __html: getNodeHTML(props.element) }}
 				/>
 			</div>
-		</section>
+		</div>
 	)
 }
 

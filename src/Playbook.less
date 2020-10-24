@@ -6,7 +6,7 @@
 
 :root {
   --theme: white;
-  --panel: rgba(33, 33, 33, 0.1);
+  --panel: fade(#212121, 10%);
   --text: #212121;
   --placeholder: gray;
   --accent: #0336FF;
@@ -14,7 +14,7 @@
 
 .playbook__dark-mode {
   --theme: black;
-  --panel: rgba(245, 245, 245, 0.1);
+  --panel: fade(#F5F5F5, 10%);
   --text: #FAFAFA;
   --placeholder: #9E9E9E;
   --accent: #FFDE03;
@@ -73,7 +73,7 @@ body {
 }
 
 .playbook__menu {
-  flex: 1;
+  flex: 1 0 auto;
   padding-bottom: 10px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -102,7 +102,7 @@ body {
 }
 
 .playbook__right {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -190,7 +190,7 @@ body {
 }
 
 .playbook__content-container {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   display: flex;
   border-bottom: 1px solid var(--panel);
   box-sizing: border-box;
@@ -198,7 +198,7 @@ body {
 
 .playbook__content-preview {
   position: relative;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   z-index: @content-z-index;
 
   iframe {
@@ -227,6 +227,7 @@ body {
 .playbook__property__hidden {
   visibility: hidden;
   position: absolute;
+  left: 0;
 }
 
 .playbook__property__tag {

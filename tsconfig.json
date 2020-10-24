@@ -2,11 +2,11 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "esModuleInterop": true,
-    "target": "es5",
+    "target": "ES5",
     "outDir": "out",
     "lib": [
-      "esnext",
-      "dom"
+      "ESNext",
+      "DOM"
     ],
     "noImplicitThis": true,
     "noUnusedLocals": true,
