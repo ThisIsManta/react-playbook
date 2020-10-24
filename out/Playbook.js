@@ -63,7 +63,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(require("react"));
 var lodash_1 = __importDefault(require("lodash"));
-var fuzzy_search_1 = __importDefault(require("fuzzy-search"));
+var FuzzySearch_1 = __importDefault(require("./FuzzySearch"));
 function classNames() {
     var classes = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -85,7 +85,7 @@ var Playbook = function Playbook(props) {
         .sortBy(function (page) { return page.name; })
         .value(); }, [props.pages]);
     if (previewPathName) {
-        var page = pages.find(function (page) { return page.name === previewPathName; });
+        var page = lodash_1.default.find(pages, function (page) { return page.name === previewPathName; });
         if (!page) {
             return null;
         }
@@ -107,7 +107,7 @@ var Playbook = function Playbook(props) {
 };
 Playbook.Button = Button;
 function Index(props) {
-    var getSelectPage = react_1.useCallback(function () { return props.pages.find(function (page) { return page.name === getQueryParams()['p']; }); }, [props.pages]);
+    var getSelectPage = react_1.useCallback(function () { return lodash_1.default.find(props.pages, function (page) { return page.name === getQueryParams()['p']; }); }, [props.pages]);
     var getSearchText = react_1.useCallback(function () { return getQueryParams()['q'] || ''; }, []);
     var _a = __read(react_1.useState(getSelectPage), 2), selectPage = _a[0], setSelectPage = _a[1];
     var _b = __read(react_1.useState(getSearchText), 2), searchText = _b[0], setSearchText = _b[1];
@@ -127,7 +127,7 @@ function Index(props) {
     react_1.useEffect(function () {
         setQueryParams({ q: searchText }, true);
     }, [searchText]);
-    var searcher = react_1.useMemo(function () { return new fuzzy_search_1.default(props.pages, ['name'], { caseSensitive: false, sort: true }); }, [props.pages]);
+    var searcher = react_1.useMemo(function () { return new FuzzySearch_1.default(props.pages, ['name'], { caseSensitive: false, sort: true }); }, [props.pages]);
     var _c = __read(react_1.useState(false), 2), leftMenuVisible = _c[0], setLeftMenuVisible = _c[1];
     var _d = __read(react_1.useState(function () { var _a; return (_a = window.sessionStorage.getItem('playbook__property-panel-visible'), (_a !== null && _a !== void 0 ? _a : 'true')) === 'true'; }), 2), propertyPanelVisible = _d[0], setPropertyPanelVisible = _d[1];
     react_1.useEffect(function () {
@@ -228,7 +228,7 @@ function PassThroughContentWrapper(props) {
 var minimumPropertyPanelHeight = 45;
 function Content(props) {
     var propertyPanel = react_1.useRef(null);
-    return (react_1.default.createElement("section", null,
+    return (react_1.default.createElement("div", null,
         props.caption && react_1.default.createElement("header", { className: 'playbook__content-caption' },
             react_1.default.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", className: 'playbook__content-caption__icon' },
                 react_1.default.createElement("path", { d: "M0 0h24v24H0V0z", fill: "none" }),

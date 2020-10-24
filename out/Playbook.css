@@ -59,7 +59,7 @@ body.playbook__preview {
   color: var(--placeholder);
 }
 .playbook__menu {
-  flex: 1;
+  flex: 1 0 auto;
   padding-bottom: 10px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -83,7 +83,7 @@ body.playbook__preview {
   font-weight: 500;
 }
 .playbook__right {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -158,14 +158,14 @@ body.playbook__preview {
   fill: var(--text);
 }
 .playbook__content-container {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   display: flex;
   border-bottom: 1px solid var(--panel);
   box-sizing: border-box;
 }
 .playbook__content-preview {
   position: relative;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   z-index: 0;
 }
 .playbook__content-preview iframe {
@@ -190,6 +190,7 @@ body.playbook__preview {
 .playbook__property__hidden {
   visibility: hidden;
   position: absolute;
+  left: 0;
 }
 .playbook__property__tag {
   font-weight: 600;

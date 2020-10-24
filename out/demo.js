@@ -23,5 +23,5 @@ react_dom_1.default.render(react_1.default.createElement(Playbook_1.default, { p
         }
     ], contentWrapper: ContentWrapper, contentControl: react_1.default.createElement(Playbook_1.default.Button, null, " Dummy") }), document.getElementById('root'));
 function ContentWrapper(props) {
-    return react_1.default.createElement("main", null, props.children);
+    return react_1.default.createElement("div", null, props.children);
 }
