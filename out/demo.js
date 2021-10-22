@@ -1,27 +1,21 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var react_1 = __importDefault(require("react"));
-var react_dom_1 = __importDefault(require("react-dom"));
-var Playbook_1 = __importDefault(require("./Playbook"));
-require("./Playbook.less");
-react_dom_1.default.render(react_1.default.createElement(Playbook_1.default, { pages: [
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Playbook from './Playbook';
+import './Playbook.less';
+ReactDOM.render(_jsx(Playbook, { pages: [
         {
             name: 'button',
-            content: (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement("button", null, "Button"),
-                react_1.default.createElement("button", { disabled: true }, "Button")))
+            content: (_jsxs(React.Fragment, { children: [_jsx("button", { children: "Button" }, void 0), _jsx("button", Object.assign({ disabled: true }, { children: "Button" }), void 0)] }, void 0))
         },
         {
             name: 'input',
             content: {
-                'default': react_1.default.createElement("input", null),
-                'disabled': react_1.default.createElement("input", { disabled: true }),
+                'default': _jsx("input", {}, void 0),
+                'disabled': _jsx("input", { disabled: true }, void 0),
             }
         }
-    ], contentWrapper: ContentWrapper, contentControl: react_1.default.createElement(Playbook_1.default.Button, null, " Dummy") }), document.getElementById('root'));
+    ], contentWrapper: ContentWrapper, contentControl: _jsx(Playbook.Button, { children: " Dummy" }, void 0) }, void 0), document.getElementById('root'));
 function ContentWrapper(props) {
-    return react_1.default.createElement("div", null, props.children);
+    return _jsx("div", { children: props.children }, void 0);
 }

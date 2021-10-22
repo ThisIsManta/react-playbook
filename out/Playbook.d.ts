@@ -1,7 +1,7 @@
 import React from 'react';
 export interface IPlaybookPage {
     name: string;
-    content: React.ReactFragment | {
+    content: React.ReactElement | {
         [caption: string]: React.ReactElement;
     };
 }
