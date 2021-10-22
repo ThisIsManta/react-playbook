@@ -8,7 +8,7 @@ function classNames(...classes: Array<any>) {
 
 export interface IPlaybookPage {
 	name: string
-	content: React.ReactFragment | { [caption: string]: React.ReactElement }
+	content: React.ReactElement | { [caption: string]: React.ReactElement }
 }
 
 type Props = {

@@ -5,7 +5,7 @@
   "main": "out/index.js",
   "types": "out/index.d.ts",
   "scripts": {
-    "start": "parcel ./src/demo.html --out-dir tmp --open",
+    "start": "vite",
     "build": "rm -rf out && tsc --project ./tsconfig.json && lessc ./src/Playbook.less ./out/Playbook.css",
     "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build",
     "postversion": "git push --tags origin master:master"
@@ -28,18 +28,19 @@
   },
   "homepage": "https://github.com/ThisIsManta/react-playbook#readme",
   "devDependencies": {
-    "@types/lodash": "^4.14.162",
-    "@types/react": "^16.9.52",
-    "@types/react-dom": "^16.9.8",
-    "less": "^3.12.2",
-    "lodash": "^4.17.20",
-    "parcel-bundler": "^1.12.4",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "typescript": "^3.7.5"
+    "@types/lodash": "^4.14.176",
+    "@types/react": "^17.0.31",
+    "@types/react-dom": "^17.0.10",
+    "@vitejs/plugin-react": "^1.0.5",
+    "less": "^4.1.2",
+    "lodash": "^4.17.21",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "typescript": "^4.4.4",
+    "vite": "^2.6.10"
   },
   "peerDependencies": {
-    "lodash": "^4.17.0",
-    "react": "^16.13.0"
+    "lodash": "^4.17.21",
+    "react": ">=16"
   }
 }

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "esModuleInterop": true,
-    "target": "ES5",
+    "target": "ES6",
     "outDir": "out",
     "lib": [
       "ESNext",
@@ -16,8 +16,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "downlevelIteration": true,
-    "jsx": "react",
-    "resolveJsonModule": true,
+    "jsx": "react-jsx",
     "removeComments": true,
     "declaration": true,
     "sourceMap": false
