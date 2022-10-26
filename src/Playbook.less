@@ -73,7 +73,7 @@ body {
 }
 
 .playbook__menu {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   padding-bottom: 10px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -259,7 +259,7 @@ body {
   display: none;
 }
 
-@media (max-width: @left-side-width + @content-implicit-width + @content-property-width) {
+@media (max-width: (@left-side-width + @content-implicit-width + @content-property-width)) {
   #playbook__side-menu-toggle {
     display: inline-block;
   }
@@ -282,7 +282,7 @@ body {
   }
 }
 
-@media (max-width: @content-implicit-width + @content-property-width) {
+@media (max-width: (@content-implicit-width + @content-property-width)) {
   #playbook__property-panel-toggle {
     display: none;
   }
