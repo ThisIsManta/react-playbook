@@ -59,7 +59,7 @@ body.playbook__preview {
   color: var(--placeholder);
 }
 .playbook__menu {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   padding-bottom: 10px;
   overflow-x: hidden;
   overflow-y: auto;
