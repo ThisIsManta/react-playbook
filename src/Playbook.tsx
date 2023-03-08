@@ -270,7 +270,7 @@ function Contents(props: {
 	if (elements.length === 0) {
 		return (
 			<div className='playbook__error'>
-				Expected to render React elements, but found {JSON.stringify(props.page.content)}.
+				Expected to render React elements, but found {_.isObjectLike(props.page.content) ? JSON.stringify(props.page.content) : String(props.page.content)}.
 			</div>
 		)
 	}
