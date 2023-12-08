@@ -28,7 +28,7 @@ if (previewPathName && !document.title) {
 	document.title = previewPathName
 }
 
-if (previewPathName) {
+if (previewPathName && window.parent !== window.self) {
 	document.body.classList.add('playbook__preview')
 }
 
