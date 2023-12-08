@@ -16,7 +16,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "downlevelIteration": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "removeComments": true,
     "declaration": true,
     "sourceMap": false

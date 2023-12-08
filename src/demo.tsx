@@ -1,10 +1,10 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import Playbook from './Playbook'
 import './Playbook.less'
 
-ReactDOM.render(
+createRoot(document.getElementById('root')!).render(
 	<Playbook
 		pages={[
 			{
@@ -25,9 +25,8 @@ ReactDOM.render(
 			}
 		]}
 		contentWrapper={ContentWrapper}
-		contentControl={< Playbook.Button > Dummy</Playbook.Button >}
-	/>,
-	document.getElementById('root'),
+		contentControl={<Playbook.Button> Dummy</Playbook.Button>}
+	/>
 )
 
 function ContentWrapper(props: { children: React.ReactElement }) {
