@@ -426,7 +426,7 @@ function getNodeHTML(node: React.ReactNode): string {
 		const innerHTML = getNodeHTML(children)
 
 		if (innerHTML) {
-			outerHTML += _.escape('>') + innerHTML + _.escape('</') + tagName + _.escape('>')
+			outerHTML += _.escape('>') + '<div class="playbook__property__indent">' + innerHTML + '</div>' + _.escape('</') + tagName + _.escape('>')
 		} else {
 			outerHTML += _.escape('/>')
 		}
