@@ -24,6 +24,10 @@ interface IPlaybook {
 
 const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''))
 
+if (previewPathName && !document.title) {
+	document.title = previewPathName
+}
+
 if (previewPathName) {
 	document.body.classList.add('playbook__preview')
 }
@@ -103,6 +107,12 @@ function Index(props: Props) {
 			setSearchText(getSearchText())
 		})
 	}, [])
+
+	useEffect(() => {
+		if (selectPage) {
+			document.title = selectPage.name
+		}
+	}, [selectPage])
 
 	useEffect(() => {
 		setQueryParams({ q: searchText }, true)
