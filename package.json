@@ -1,6 +1,6 @@
 {
   "name": "react-playbook",
-  "version": "3.1.1",
+  "version": "4.0.0",
   "description": "",
   "main": "out/index.js",
   "types": "out/index.d.ts",
