@@ -6,9 +6,9 @@
 
 :root {
   --theme: white;
-  --panel: fade(#212121, 10%);
+  --panel: fade(#212121, 5%);
   --text: #212121;
-  --placeholder: gray;
+  --placeholder: #9E9E9E;
   --accent: #0336FF;
 }
 
@@ -16,7 +16,7 @@
   --theme: black;
   --panel: fade(#F5F5F5, 10%);
   --text: #FAFAFA;
-  --placeholder: #9E9E9E;
+  --placeholder: #757575;
   --accent: #FFDE03;
 }
 
@@ -31,7 +31,7 @@ body {
   &.playbook__preview {
     width: auto;
     height: auto;
-    padding: 20px;
+    padding: 10px (28px + 10px + 10px) 10px 10px;
     box-sizing: border-box;
   }
 }
@@ -49,7 +49,7 @@ body {
   width: @left-side-width;
   flex: 0 0 auto;
   transition: width 0.3s ease-out;
-  background: var(--theme);
+  background: var(--panel);
   box-sizing: border-box;
   user-select: none;
   display: flex;
@@ -59,19 +59,48 @@ body {
 }
 
 .playbook__search-box {
-  width: 100%;
-  padding: 16px 10px;
-  box-sizing: border-box;
-  font-family: @font-family;
-  font-size: inherit;
-  border: none;
-  outline: none;
-  background: var(--theme);
-  color: var(--text);
+  position: relative;
 
-  &::placeholder {
-    color: var(--placeholder);
+  @search-icon-dimension: 20px;
+
+  .playbook__search-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    height: @search-icon-dimension;
+    width: @search-icon-dimension;
+    fill: var(--placeholder);
+    pointer-events: none;
   }
+
+  input {
+    width: 100%;
+    padding: 16px 10px 16px (10px + @search-icon-dimension + 5px);
+    box-sizing: border-box;
+    font-family: @font-family;
+    font-size: inherit;
+    font-weight: 500;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--accent);
+
+    &::placeholder {
+      color: var(--placeholder);
+    }
+
+    &::selection {
+      background: var(--accent);
+      color: var(--theme);
+    }
+  }
+}
+
+.playbook__no-results {
+  padding: 10px;
+  text-align: center;
+  fill: var(--placeholder);
 }
 
 .playbook__menu {
@@ -88,8 +117,10 @@ body {
   color: var(--text);
   text-decoration: none;
   word-break: break-word;
+  outline: none;
 
-  &:hover {
+  &:hover,
+  &:focus {
     color: var(--accent);
   }
 
@@ -132,7 +163,7 @@ body {
   line-height: 1;
   box-sizing: border-box;
 
-  &:hover {
+  &:hover:not(.playbook__button__active) {
     color: var(--accent);
     fill: var(--accent); // For <svg>
     border-color: var(--accent);
@@ -146,11 +177,17 @@ body {
     transform: translateY(1px);
   }
 
-  &> svg {
+  &>svg {
     width: 18px;
     height: 18px;
     display: block; // For <svg>
   }
+}
+
+.playbook__button__active {
+  background: var(--accent);
+  color: var(--theme);
+  fill: var(--theme); // For <svg>
 }
 
 .playbook__contents {
@@ -161,7 +198,7 @@ body {
   overflow-y: auto;
   background: var(--theme);
 
-  &> * {
+  &>* {
     display: flex;
     flex-direction: column;
 
@@ -183,8 +220,9 @@ body {
   width: 14px;
   height: 14px;
   vertical-align: top;
-  margin-right: 5px;
+  margin-right: 2px;
   fill: var(--text);
+  transform: translateY(2px) rotate(-90deg);
 }
 
 .playbook__content-container {
@@ -213,8 +251,7 @@ body {
 .playbook__property {
   flex: 0 0 @content-property-width;
   box-sizing: border-box;
-  border-left: 1px solid var(--panel);
-  background: var(--theme);
+  background: var(--panel);
   color: var(--text);
   font-family: Roboto Mono, Consolas;
   font-size: 12px;

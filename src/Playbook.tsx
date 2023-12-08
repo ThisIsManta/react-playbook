@@ -2,8 +2,8 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import _ from 'lodash'
 import FuzzySearch from './FuzzySearch'
 
-function classNames(...classes: Array<any>) {
-	return _.compact(classes).join(' ')
+function classNames(...classes: Array<string | boolean | undefined | null>) {
+	return classes.filter((item): item is string => typeof item === 'string').map(item => item.trim()).join(' ')
 }
 
 export interface IPlaybookPage {
@@ -143,14 +143,26 @@ function Index(props: Props) {
 	}, [props.pages])
 
 	const menus = useMemo(
-		() => searcher.search(searchText).map(page => (
-			<MenuItemMemoized
-				key={page.name}
-				name={page.name}
-				selected={page.name === selectPage?.name}
-				onClick={onMenuItemClick}
-			/>
-		)),
+		() => {
+			const results = searcher.search(searchText)
+
+			if (results.length === 0) {
+				return (
+					<div className='playbook__no-results'>
+						<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="20px" viewBox="0 0 24 24" width="20px"><g><path d="M0,0h24v24H0V0z" fill="none" /></g><g><path d="M2.81,2.81L1.39,4.22l2.27,2.27C2.61,8.07,2,9.96,2,12c0,5.52,4.48,10,10,10c2.04,0,3.93-0.61,5.51-1.66l2.27,2.27 l1.41-1.41L2.81,2.81z M12,20c-4.41,0-8-3.59-8-8c0-1.48,0.41-2.86,1.12-4.06l10.94,10.94C14.86,19.59,13.48,20,12,20z M7.94,5.12 L6.49,3.66C8.07,2.61,9.96,2,12,2c5.52,0,10,4.48,10,10c0,2.04-0.61,3.93-1.66,5.51l-1.46-1.46C19.59,14.86,20,13.48,20,12 c0-4.41-3.59-8-8-8C10.52,4,9.14,4.41,7.94,5.12z" /></g></svg>
+					</div>
+				)
+			}
+
+			return results.map(page => (
+				<MenuItemMemoized
+					key={page.name}
+					name={page.name}
+					selected={page.name === selectPage?.name}
+					onClick={onMenuItemClick}
+				/>
+			))
+		},
 		[searcher, searchText, selectPage],
 	)
 
@@ -169,21 +181,23 @@ function Index(props: Props) {
 					}
 				}}
 			>
-				<input
-					className='playbook__search-box'
-					type='text'
-					placeholder='Search here'
-					value={searchText}
-					onChange={e => {
-						setSearchText(e.target.value)
-					}}
-					onKeyUp={e => {
-						if (e.key === 'Escape' && searchText !== '') {
-							setSearchText('')
-							e.stopPropagation()
-						}
-					}}
-				/>
+				<div className='playbook__search-box'>
+					<svg className='playbook__search-icon' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></svg>
+					<input
+						type='text'
+						value={searchText}
+						placeholder='Search'
+						onChange={e => {
+							setSearchText(e.target.value)
+						}}
+						onKeyUp={e => {
+							if (e.key === 'Escape' && searchText !== '') {
+								setSearchText('')
+								e.stopPropagation()
+							}
+						}}
+					/>
+				</div>
 				<div className='playbook__menu'>
 					{menus}
 				</div>
@@ -206,6 +220,7 @@ function Index(props: Props) {
 					<div style={{ flex: '1 1 auto' }} />
 					<Button
 						title='Toggle dark mode'
+						active={darkMode}
 						onClick={() => {
 							if (darkMode) {
 								window.localStorage.removeItem('playbook__dark-mode')
@@ -216,19 +231,15 @@ function Index(props: Props) {
 							window.location.reload()
 						}}
 					>
-						{darkMode
-							? <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ><path d="M0 0h24v24H0z" fill="none" /><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" /></svg>
-							: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z" /></svg>
-						}
+						<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"><rect fill="none" height="24" width="24" /><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z" /></svg>
 					</Button>
 					<Button
 						id='playbook__property-panel-toggle'
-						title={propertyPanelVisible ? 'Hide property panel' : 'Show property panel'}
+						title='Toggle property panel'
+						active={propertyPanelVisible}
 						onClick={() => { setPropertyPanelVisible(value => !value) }}
 					>
-						{propertyPanelVisible
-							? <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" /></svg>
-							: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path d="M23 21.74l-1.46-1.46L7.21 5.95 3.25 1.99 1.99 3.25l2.7 2.7h-.64c-1.11 0-1.99.89-1.99 2l-.01 11c0 1.11.89 2 2 2h15.64L21.74 23 23 21.74zM22 7.95c.05-1.11-.84-2-1.95-1.95h-4V3.95c0-1.11-.89-2-2-1.95h-4c-1.11-.05-2 .84-2 1.95v.32l13.95 14V7.95zM14.05 6H10V3.95h4.05V6z" /></svg>}
+						<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" /></svg>
 					</Button>
 				</div>
 				<div className='playbook__contents'>
@@ -317,7 +328,7 @@ function Content(props: {
 	return (
 		<div>
 			{props.caption && <header className='playbook__content-caption'>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='playbook__content-caption__icon'><path d="M0 0h24v24H0V0z" fill="none" /><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" /></svg>
+				<svg className='playbook__content-caption__icon' xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" /></svg>
 				{props.caption}
 			</header>}
 			<div className='playbook__content-container'>
@@ -351,10 +362,7 @@ function Content(props: {
 						title='Open in a new tab'
 						onClick={() => { window.open(props.link, '_blank') }}
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24">
-							<rect fill="none" height="24" width="24" />
-							<path d="M9,5v2h6.59L4,18.59L5.41,20L17,8.41V15h2V5H9z" />
-						</svg>
+						<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"><rect fill="none" height="24" width="24" /><polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" /></svg>
 					</Button>
 				</div>
 				<div
@@ -370,8 +378,13 @@ function Content(props: {
 	)
 }
 
-function Button(props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>) {
-	return <button className='playbook__button' {...props} />
+function Button({ active, ...props }: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & { active?: boolean }) {
+	return (
+		<button
+			{...props}
+			className={classNames('playbook__button', active && 'playbook__button__active', props.className)}
+		/>
+	)
 }
 
 export function getElements(content: IPlaybookPage['content']): Array<{ caption?: string, element: React.ReactElement }> {
