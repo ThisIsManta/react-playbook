@@ -1,15 +1,15 @@
 :root {
   --theme: white;
-  --panel: rgba(33, 33, 33, 0.1);
+  --panel: rgba(33, 33, 33, 0.05);
   --text: #212121;
-  --placeholder: gray;
+  --placeholder: #9E9E9E;
   --accent: #0336FF;
 }
 .playbook__dark-mode {
   --theme: black;
   --panel: rgba(245, 245, 245, 0.1);
   --text: #FAFAFA;
-  --placeholder: #9E9E9E;
+  --placeholder: #757575;
   --accent: #FFDE03;
 }
 body {
@@ -18,11 +18,12 @@ body {
   height: 100vh;
   background: var(--theme);
   color: var(--text);
+  overflow: hidden;
 }
 body.playbook__preview {
   width: auto;
   height: auto;
-  padding: 20px;
+  padding: 10px 48px 10px 10px;
   box-sizing: border-box;
 }
 .playbook {
@@ -37,7 +38,7 @@ body.playbook__preview {
   width: 260px;
   flex: 0 0 auto;
   transition: width 0.3s ease-out;
-  background: var(--theme);
+  background: var(--panel);
   box-sizing: border-box;
   user-select: none;
   display: flex;
@@ -46,17 +47,41 @@ body.playbook__preview {
   outline: none;
 }
 .playbook__search-box {
+  position: relative;
+}
+.playbook__search-box .playbook__search-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 10px;
+  height: 20px;
+  width: 20px;
+  fill: var(--placeholder);
+  pointer-events: none;
+}
+.playbook__search-box input {
   width: 100%;
-  padding: 16px 10px;
+  padding: 16px 10px 16px 35px;
   box-sizing: border-box;
   font-family: Roboto, sans-serif;
+  font-size: inherit;
+  font-weight: 500;
   border: none;
   outline: none;
-  background: var(--theme);
-  color: var(--text);
+  background: transparent;
+  color: var(--accent);
 }
-.playbook__search-box::placeholder {
+.playbook__search-box input::placeholder {
   color: var(--placeholder);
+}
+.playbook__search-box input::selection {
+  background: var(--accent);
+  color: var(--theme);
+}
+.playbook__no-results {
+  padding: 10px;
+  text-align: center;
+  fill: var(--placeholder);
 }
 .playbook__menu {
   flex: 1 1 auto;
@@ -71,8 +96,10 @@ body.playbook__preview {
   color: var(--text);
   text-decoration: none;
   word-break: break-word;
+  outline: none;
 }
-.playbook__menu__item:hover {
+.playbook__menu__item:hover,
+.playbook__menu__item:focus {
   color: var(--accent);
 }
 .playbook__menu__item.--select {
@@ -91,13 +118,10 @@ body.playbook__preview {
 .playbook__toolbar {
   display: flex;
   background: var(--panel);
-  min-height: 30px;
   align-items: center;
   box-sizing: border-box;
-  padding: 5px;
-}
-.playbook__toolbar > * {
-  margin: 5px;
+  padding: 10px;
+  gap: 10px;
 }
 .playbook__button {
   appearance: none;
@@ -112,7 +136,7 @@ body.playbook__preview {
   line-height: 1;
   box-sizing: border-box;
 }
-.playbook__button:hover {
+.playbook__button:hover:not(.playbook__button__active) {
   color: var(--accent);
   fill: var(--accent);
   border-color: var(--accent);
@@ -127,6 +151,11 @@ body.playbook__preview {
   width: 18px;
   height: 18px;
   display: block;
+}
+.playbook__button__active {
+  background: var(--accent);
+  color: var(--theme);
+  fill: var(--theme);
 }
 .playbook__contents {
   display: flex;
@@ -154,8 +183,9 @@ body.playbook__preview {
   width: 14px;
   height: 14px;
   vertical-align: top;
-  margin-right: 5px;
+  margin-right: 2px;
   fill: var(--text);
+  transform: translateY(2px) rotate(-90deg);
 }
 .playbook__content-container {
   flex: 1 1 auto;
@@ -179,8 +209,7 @@ body.playbook__preview {
 .playbook__property {
   flex: 0 0 260px;
   box-sizing: border-box;
-  border-left: 1px solid var(--panel);
-  background: var(--theme);
+  background: var(--panel);
   color: var(--text);
   font-family: Roboto Mono, Consolas;
   font-size: 12px;

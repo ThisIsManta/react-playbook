@@ -1,5 +1,5 @@
 import React from 'react';
-export declare type Storybook = {
+export type Storybook = {
     stories: {
         [name: string]: (_createLogger: typeof createLogger) => React.ReactElement;
     };

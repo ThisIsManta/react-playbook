@@ -5,7 +5,7 @@ export interface IPlaybookPage {
         [caption: string]: React.ReactElement;
     };
 }
-declare type Props = {
+type Props = {
     pages: Array<IPlaybookPage>;
     contentControl?: React.ComponentType | React.ReactElement;
     contentWrapper?: React.ComponentType<{
@@ -17,7 +17,9 @@ interface IPlaybook {
     Button: typeof Button;
 }
 declare const Playbook: IPlaybook;
-declare function Button(props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>): JSX.Element;
+declare function Button({ active, ...props }: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
+    active?: boolean;
+}): React.JSX.Element;
 export declare function getElements(content: IPlaybookPage['content']): Array<{
     caption?: string;
     element: React.ReactElement;

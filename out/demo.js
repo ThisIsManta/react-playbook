@@ -1,21 +1,22 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Playbook from './Playbook';
 import './Playbook.less';
-ReactDOM.render(_jsx(Playbook, { pages: [
+createRoot(document.getElementById('root')).render(React.createElement(Playbook, { pages: [
         {
             name: 'button',
-            content: (_jsxs(React.Fragment, { children: [_jsx("button", { children: "Button" }, void 0), _jsx("button", Object.assign({ disabled: true }, { children: "Button" }), void 0)] }, void 0))
+            content: (React.createElement(React.Fragment, null,
+                React.createElement("button", null, "Button"),
+                React.createElement("button", { disabled: true }, "Button")))
         },
         {
             name: 'input',
             content: {
-                'default': _jsx("input", {}, void 0),
-                'disabled': _jsx("input", { disabled: true }, void 0),
+                'default': React.createElement("input", null),
+                'disabled': React.createElement("input", { disabled: true }),
             }
         }
-    ], contentWrapper: ContentWrapper, contentControl: _jsx(Playbook.Button, { children: " Dummy" }, void 0) }, void 0), document.getElementById('root'));
+    ], contentWrapper: ContentWrapper, contentControl: React.createElement(Playbook.Button, null, " Dummy") }));
 function ContentWrapper(props) {
-    return _jsx("div", { children: props.children }, void 0);
+    return React.createElement("div", null, props.children);
 }
