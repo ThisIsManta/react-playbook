@@ -116,13 +116,13 @@ function Index(props: Props) {
 	// Only for responsive view
 	const [leftMenuVisible, setLeftMenuVisible] = useState(false)
 
-	const [propertyPanelVisible, setPropertyPanelVisible] = useState(() => (window.sessionStorage.getItem('playbook__property-panel-visible') ?? 'true') === 'true')
+	const [propertyPanelVisible, setPropertyPanelVisible] = useState(() => Boolean(window.sessionStorage.getItem('playbook__property-panel-visible') ?? 'true'))
 
 	useEffect(() => {
 		if (propertyPanelVisible) {
 			window.sessionStorage.setItem('playbook__property-panel-visible', 'true')
 		} else {
-			window.sessionStorage.removeItem('playbook__property-panel-visible')
+			window.sessionStorage.setItem('playbook__property-panel-visible', '')
 		}
 	}, [propertyPanelVisible])
 
@@ -350,7 +350,7 @@ function Content(props: {
 				<div
 					className={classNames(
 						'playbook__property',
-						props.propertyPanelVisible && 'playbook__property__hidden',
+						!props.propertyPanelVisible && 'playbook__property__hidden',
 					)}
 					ref={propertyPanel}
 					dangerouslySetInnerHTML={{ __html: getNodeHTML(props.element) }}
@@ -476,12 +476,12 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 
 		const list = String(value).split(/\r?\n/)
 		const indent = new RegExp(
-			'^' + _.chain(list)
+			'^' + (_.chain(list)
 				.map(line => line.replace(/\t/g, '  ').match(/^\s+/))
 				.compact()
 				.map(([match]) => match)
 				.minBy(match => match.length)
-				.value() ?? '',
+				.value() || ''),
 		)
 		const text = list.map(line => line.replace(indent, '')).join('\n')
 
