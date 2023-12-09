@@ -22,6 +22,10 @@ createRoot(document.getElementById('root')!).render(
 					'default': <input />,
 					'disabled': <input disabled />,
 				}
+			},
+			{
+				name: 'textarea',
+				content: () => <textarea></textarea>
 			}
 		]}
 		contentWrapper={ContentWrapper}

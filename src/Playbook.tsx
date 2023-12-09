@@ -8,7 +8,7 @@ function classNames(...classes: Array<string | boolean | undefined | null>) {
 
 export interface IPlaybookPage {
 	name: string
-	content: React.ReactElement | { [caption: string]: React.ReactElement }
+	content: React.ReactElement | { [caption: string]: React.ReactElement } | (() => React.ReactElement)
 }
 
 type Props = {
@@ -291,6 +291,11 @@ function Contents(props: {
 	page: IPlaybookPage,
 	propertyPanelVisible: boolean,
 }) {
+	if (_.isFunction(props.page.content)) {
+		const Content = props.page.content
+		return <React.Suspense><Content /></React.Suspense>
+	}
+
 	const elements = getElements(props.page.content)
 
 	if (elements.length === 0) {
@@ -304,7 +309,7 @@ function Contents(props: {
 	return (
 		<React.Fragment>
 			{elements.map(({ caption, element }, index) => (
-				<Content
+				<ContentWithCaption
 					key={props.page.name + '#' + index}
 					link={'/' + window.encodeURI(props.page.name) + '#' + index}
 					caption={caption}
@@ -322,7 +327,7 @@ function PassThroughContentWrapper(props: { children: React.ReactElement }) {
 
 const minimumPropertyPanelHeight = 45 // Represent total height of `playbook__property` with a single line text
 
-function Content(props: {
+function ContentWithCaption(props: {
 	link: string
 	caption: string | undefined,
 	element: React.ReactElement,
