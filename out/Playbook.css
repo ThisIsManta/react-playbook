@@ -14,6 +14,8 @@
 }
 body {
   margin: 0;
+}
+body.playbook__theater {
   width: 100vw;
   height: 100vh;
   background: var(--theme);

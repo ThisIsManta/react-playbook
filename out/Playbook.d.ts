@@ -3,7 +3,7 @@ export interface IPlaybookPage {
     name: string;
     content: React.ReactElement | {
         [caption: string]: React.ReactElement;
-    };
+    } | (() => React.ReactElement);
 }
 type Props = {
     pages: Array<IPlaybookPage>;

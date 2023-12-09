@@ -16,11 +16,16 @@ function classNames(...classes) {
     return classes.filter((item) => typeof item === 'string').map(item => item.trim()).join(' ');
 }
 const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''));
-if (previewPathName && !document.title) {
-    document.title = previewPathName;
+if (!previewPathName) {
+    document.body.classList.add('playbook__theater');
 }
-if (previewPathName && window.parent !== window.self) {
-    document.body.classList.add('playbook__preview');
+else {
+    if (!document.title) {
+        document.title = previewPathName;
+    }
+    if (window.parent !== window.self) {
+        document.body.classList.add('playbook__preview');
+    }
 }
 const darkMode = window.localStorage.getItem('playbook__dark-mode') === 'true';
 if (darkMode) {
@@ -99,7 +104,7 @@ function Index(props) {
         const results = searcher.search(searchText);
         if (results.length === 0) {
             return (React.createElement("div", { className: 'playbook__no-results' },
-                React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", height: "20px", viewBox: "0 0 24 24", width: "20px" },
+                React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: "20px", viewBox: "0 0 24 24", width: "20px" },
                     React.createElement("g", null,
                         React.createElement("path", { d: "M0,0h24v24H0V0z", fill: "none" })),
                     React.createElement("g", null,
@@ -146,7 +151,7 @@ function Index(props) {
                         }
                         window.location.reload();
                     } },
-                    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", height: "24px", viewBox: "0 0 24 24", width: "24px" },
+                    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: "24px", viewBox: "0 0 24 24", width: "24px" },
                         React.createElement("rect", { fill: "none", height: "24", width: "24" }),
                         React.createElement("path", { d: "M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z" }))),
                 React.createElement(Button, { id: 'playbook__property-panel-toggle', title: 'Toggle property panel', active: propertyPanelVisible, onClick: () => { setPropertyPanelVisible(value => !value); } },
@@ -168,6 +173,11 @@ function MenuItem(props) {
 }
 const ContentsMemoized = React.memo(Contents);
 function Contents(props) {
+    if (_.isFunction(props.page.content)) {
+        const Content = props.page.content;
+        return React.createElement(React.Suspense, null,
+            React.createElement(Content, null));
+    }
     const elements = getElements(props.page.content);
     if (elements.length === 0) {
         return (React.createElement("div", { className: 'playbook__error' },
@@ -175,13 +185,13 @@ function Contents(props) {
             _.isObjectLike(props.page.content) ? JSON.stringify(props.page.content) : String(props.page.content),
             "."));
     }
-    return (React.createElement(React.Fragment, null, elements.map(({ caption, element }, index) => (React.createElement(Content, { key: props.page.name + '#' + index, link: '/' + window.encodeURI(props.page.name) + '#' + index, caption: caption, element: element, propertyPanelVisible: props.propertyPanelVisible })))));
+    return (React.createElement(React.Fragment, null, elements.map(({ caption, element }, index) => (React.createElement(ContentWithCaption, { key: props.page.name + '#' + index, link: '/' + window.encodeURI(props.page.name) + '#' + index, caption: caption, element: element, propertyPanelVisible: props.propertyPanelVisible })))));
 }
 function PassThroughContentWrapper(props) {
     return props.children;
 }
 const minimumPropertyPanelHeight = 45;
-function Content(props) {
+function ContentWithCaption(props) {
     const propertyPanel = useRef(null);
     return (React.createElement("div", null,
         props.caption && React.createElement("header", { className: 'playbook__content-caption' },
@@ -204,7 +214,7 @@ function Content(props) {
                         }
                     } }),
                 React.createElement(Button, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: () => { window.open(props.link, '_blank'); } },
-                    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", "enable-background": "new 0 0 24 24", height: "24px", viewBox: "0 0 24 24", width: "24px" },
+                    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: "24px", viewBox: "0 0 24 24", width: "24px" },
                         React.createElement("rect", { fill: "none", height: "24", width: "24" }),
                         React.createElement("polygon", { points: "21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" })))),
             React.createElement("div", { className: classNames('playbook__property', !props.propertyPanelVisible && 'playbook__property__hidden'), ref: propertyPanel, dangerouslySetInnerHTML: { __html: getNodeHTML(props.element) } }))));

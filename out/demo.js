@@ -15,6 +15,10 @@ createRoot(document.getElementById('root')).render(React.createElement(Playbook,
                 'default': React.createElement("input", null),
                 'disabled': React.createElement("input", { disabled: true }),
             }
+        },
+        {
+            name: 'textarea',
+            content: () => React.createElement("textarea", null)
         }
     ], contentWrapper: ContentWrapper, contentControl: React.createElement(Playbook.Button, null, " Dummy") }));
 function ContentWrapper(props) {
