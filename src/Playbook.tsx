@@ -24,12 +24,17 @@ interface IPlaybook {
 
 const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''))
 
-if (previewPathName && !document.title) {
-	document.title = previewPathName
-}
+if (!previewPathName) {
+	document.body.classList.add('playbook__theater')
 
-if (previewPathName && window.parent !== window.self) {
-	document.body.classList.add('playbook__preview')
+} else {
+	if (!document.title) {
+		document.title = previewPathName
+	}
+
+	if (window.parent !== window.self) {
+		document.body.classList.add('playbook__preview')
+	}
 }
 
 const darkMode = window.localStorage.getItem('playbook__dark-mode') === 'true'
