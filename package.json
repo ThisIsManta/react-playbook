@@ -1,5 +1,5 @@
 {
-  "name": "react-playbook",
+  "name": "@thisismanta/react-playbook",
   "version": "4.1.0",
   "description": "",
   "main": "out/index.js",
@@ -7,7 +7,8 @@
   "scripts": {
     "start": "vite",
     "build": "rm -rf out && tsc --project ./tsconfig.json && lessc ./src/Playbook.less ./out/Playbook.css",
-    "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build"
+    "preversion": "npm run build && rm ./out/demo.js && git add ./out/** && git commit --allow-empty -m Build",
+    "version": "npm publish --access public"
   },
   "repository": {
     "type": "git",
@@ -33,14 +34,14 @@
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
     "less": "^4.2.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.7"
   },
   "peerDependencies": {
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.0",
     "react": ">=16"
   },
   "volta": {
