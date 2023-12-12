@@ -7,8 +7,7 @@
   "scripts": {
     "start": "vite",
     "build": "rm -rf out && tsc --project ./tsconfig.json && lessc ./src/Playbook.less ./out/Playbook.css",
-    "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build",
-    "postversion": "git push --tags origin master:master"
+    "preversion": "npm run build && git add ./out/** && git commit --allow-empty -m Build"
   },
   "repository": {
     "type": "git",
@@ -28,6 +27,7 @@
   },
   "homepage": "https://github.com/ThisIsManta/react-playbook#readme",
   "devDependencies": {
+    "@thisismanta/semantic-version": "^5.0.2",
     "@types/lodash": "^4.14.202",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
@@ -42,5 +42,8 @@
   "peerDependencies": {
     "lodash": "^4.17.21",
     "react": ">=16"
+  },
+  "volta": {
+    "node": "20.10.0"
   }
 }

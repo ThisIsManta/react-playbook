@@ -1,0 +1,1 @@
+See the usage example at [src/demo.tsx](./src/demo.tsx)
