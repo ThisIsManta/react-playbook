@@ -1,5 +1,12 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
-import _ from 'lodash'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import get from 'lodash/get'
+import escape from 'lodash/escape'
+import isObject from 'lodash/isObject'
+import identity from 'lodash/identity'
+import compact from 'lodash/compact'
+import uniqBy from 'lodash/uniqBy'
+import sortBy from 'lodash/sortBy'
+import minBy from 'lodash/minBy'
 import FuzzySearch from './FuzzySearch'
 
 function classNames(...classes: Array<string | boolean | undefined | null>) {
@@ -8,7 +15,7 @@ function classNames(...classes: Array<string | boolean | undefined | null>) {
 
 export interface IPlaybookPage {
 	name: string
-	content: React.ReactElement | { [caption: string]: React.ReactElement } | (() => React.ReactElement)
+	content: () => React.ReactElement
 }
 
 type Props = {
@@ -20,16 +27,17 @@ type Props = {
 interface IPlaybook {
 	(props: Props): React.ReactElement | null
 	Button: typeof Button
+	Catalog: typeof Catalog
 }
 
-const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''))
+const previewPageName = getQueryParams().r
 
-if (!previewPathName) {
+if (!previewPageName) {
 	document.body.classList.add('playbook__theater')
 
 } else {
 	if (!document.title) {
-		document.title = previewPathName
+		document.title = previewPageName
 	}
 
 	if (window.parent !== window.self) {
@@ -44,39 +52,29 @@ if (darkMode) {
 
 const Playbook: IPlaybook = function Playbook(props: Props) {
 	const pages = useMemo(
-		() => _.chain(props.pages)
-			.uniqBy(page => page.name)
-			.sortBy(page => page.name)
-			.value(),
+		() => sortBy(
+			uniqBy(props.pages, page => page.name),
+			page => page.name),
 		[props.pages],
 	)
 
-	if (previewPathName) {
-		const page = _.find(pages, page => page.name === previewPathName)
+	if (previewPageName) {
+		const page = pages.find(page => page.name === previewPageName)
 
-		if (!page) {
+		if (!page || typeof page.content !== 'function') {
+			// TODO: show not-found page
 			return null
 		}
 
-		const elements = getElements(page.content)
-
-		if (elements.length === 0) {
-			return null
-		}
-
-		const index = parseInt(window.location.hash.replace(/^#/, '')) || 0
-		const element = elements[index]
-
-		if (!element) {
-			return null
-		}
-
+		const Content = page.content
 		const ContentWrapper = props.contentWrapper || PassThroughContentWrapper
 
 		return (
 			<ErrorBoundary>
 				<ContentWrapper>
-					{element.element}
+					<React.Suspense>
+						<Content />
+					</React.Suspense>
 				</ContentWrapper>
 			</ErrorBoundary>
 		)
@@ -90,9 +88,10 @@ const Playbook: IPlaybook = function Playbook(props: Props) {
 }
 
 Playbook.Button = Button
+Playbook.Catalog = Catalog
 
 function Index(props: Props) {
-	const getSelectPage = useCallback(() => _.find(props.pages, page => page.name === getQueryParams()['p']), [props.pages])
+	const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages])
 	const getSearchText = useCallback(() => getQueryParams()['q'] || '', [])
 
 	const [selectPage, setSelectPage] = useState(getSelectPage)
@@ -131,16 +130,6 @@ function Index(props: Props) {
 	// Only for responsive view
 	const [leftMenuVisible, setLeftMenuVisible] = useState(false)
 
-	const [propertyPanelVisible, setPropertyPanelVisible] = useState(() => Boolean(window.sessionStorage.getItem('playbook__property-panel-visible') ?? 'true'))
-
-	useEffect(() => {
-		if (propertyPanelVisible) {
-			window.sessionStorage.setItem('playbook__property-panel-visible', 'true')
-		} else {
-			window.sessionStorage.setItem('playbook__property-panel-visible', '')
-		}
-	}, [propertyPanelVisible])
-
 	const onMenuItemClick = useCallback((pageName: string) => {
 		setSelectPage(props.pages.find(page => page.name === pageName))
 		setQueryParams({ p: pageName }, false)
@@ -170,6 +159,8 @@ function Index(props: Props) {
 		},
 		[searcher, searchText, selectPage],
 	)
+
+	const selectLink = selectPage ? '/?r=' + window.encodeURIComponent(selectPage.name) : null
 
 	return (
 		<div className='playbook'>
@@ -238,23 +229,24 @@ function Index(props: Props) {
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><rect fill="none" height="24" width="24" /><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z" /></svg>
 					</Button>
-					<Button
-						id='playbook__property-panel-toggle'
-						title='Toggle property panel'
-						active={propertyPanelVisible}
-						onClick={() => { setPropertyPanelVisible(value => !value) }}
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" /></svg>
-					</Button>
-				</div>
-				<div className='playbook__contents'>
-					{selectPage && (
-						<ContentsMemoized
-							page={selectPage}
-							propertyPanelVisible={propertyPanelVisible}
-						/>
+					{selectLink && (
+						<Button
+							title='Open in a new tab'
+							onClick={() => { window.open(selectLink, '_blank') }}
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><rect fill="none" height="24" width="24" /><polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" /></svg>
+						</Button>
 					)}
 				</div>
+				{selectLink && (
+					<iframe
+						className='playbook__content-container'
+						data-playbook-content={true}
+						src={selectLink}
+						width='100%'
+						frameBorder='0'
+					/>
+				)}
 			</div>
 		</div>
 	)
@@ -285,107 +277,8 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 	)
 }
 
-const ContentsMemoized = React.memo(Contents)
-
-function Contents(props: {
-	page: IPlaybookPage,
-	propertyPanelVisible: boolean,
-}) {
-	if (_.isFunction(props.page.content)) {
-		const Content = props.page.content
-		return <React.Suspense><Content /></React.Suspense>
-	}
-
-	const elements = getElements(props.page.content)
-
-	if (elements.length === 0) {
-		return (
-			<div className='playbook__error'>
-				Expected to render React elements, but found {_.isObjectLike(props.page.content) ? JSON.stringify(props.page.content) : String(props.page.content)}.
-			</div>
-		)
-	}
-
-	return (
-		<React.Fragment>
-			{elements.map(({ caption, element }, index) => (
-				<ContentWithCaption
-					key={props.page.name + '#' + index}
-					link={'/' + window.encodeURI(props.page.name) + '#' + index}
-					caption={caption}
-					element={element}
-					propertyPanelVisible={props.propertyPanelVisible}
-				/>
-			))}
-		</React.Fragment>
-	)
-}
-
 function PassThroughContentWrapper(props: { children: React.ReactElement }) {
 	return props.children
-}
-
-const minimumPropertyPanelHeight = 45 // Represent total height of `playbook__property` with a single line text
-
-function ContentWithCaption(props: {
-	link: string
-	caption: string | undefined,
-	element: React.ReactElement,
-	propertyPanelVisible: boolean,
-}) {
-	const propertyPanel = useRef<HTMLDivElement>(null)
-
-	return (
-		<div>
-			{props.caption && <header className='playbook__content-caption'>
-				<svg className='playbook__content-caption__icon' xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" /></svg>
-				{props.caption}
-			</header>}
-			<div className='playbook__content-container'>
-				<div className='playbook__content-preview'>
-					<iframe
-						data-playbook-content={true}
-						src={props.link}
-						width='100%'
-						height={minimumPropertyPanelHeight + 'px'}
-						frameBorder='0'
-						scrolling='no'
-						onLoad={(e) => {
-							const w = e.currentTarget.contentWindow
-							if (w) {
-								const actualContentHeight = w.document.body.clientHeight
-
-								const expectedFrameHeight = actualContentHeight <= 40
-									? Math.round(window.innerHeight * 0.8)
-									: w.document.documentElement.scrollHeight
-
-								const propertyPanelHeight = propertyPanel.current?.clientHeight ?? 0
-
-								e.currentTarget.style.height = Math.max(expectedFrameHeight, propertyPanelHeight) + 'px'
-
-								e.currentTarget.setAttribute('scrolling', 'auto')
-							}
-						}}
-					/>
-					<Button
-						id='playbook__new-window'
-						title='Open in a new tab'
-						onClick={() => { window.open(props.link, '_blank') }}
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><rect fill="none" height="24" width="24" /><polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" /></svg>
-					</Button>
-				</div>
-				<div
-					className={classNames(
-						'playbook__property',
-						!props.propertyPanelVisible && 'playbook__property__hidden',
-					)}
-					ref={propertyPanel}
-					dangerouslySetInnerHTML={{ __html: getNodeHTML(props.element) }}
-				/>
-			</div>
-		</div>
-	)
 }
 
 function Button({ active, ...props }: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & { active?: boolean }) {
@@ -397,35 +290,28 @@ function Button({ active, ...props }: React.DetailedHTMLProps<React.ButtonHTMLAt
 	)
 }
 
-export function getElements(content: IPlaybookPage['content']): Array<{ caption?: string, element: React.ReactElement }> {
-	if (_.isArray(content)) {
-		return Δ(content)
-	}
+function Catalog(props: { children: Iterable<React.ReactElement> }) {
+	const elements = React.Children.toArray(props.children).map((element, index) => (
+		<section key={index} className='playbook__catalog'>
+			{React.isValidElement(element) && /^\.\$/.test(element.key || '') && (
+				<header className='playbook__catalog__caption'>
+					<svg className='playbook__catalog__caption__icon' xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" /></svg>
+					{element.key?.match(/^\.\$(.+)/)?.[1]}
+				</header>
+			)}
+			<div className='playbook__catalog__columns'>
+				<div
+					className='playbook__catalog__property'
+					dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }}
+				/>
+				<div className='playbook__catalog__content'>
+					{element}
+				</div>
+			</div>
+		</section>
+	))
 
-	if (React.isValidElement(content)) {
-		if (content.type === React.Fragment) {
-			const fragment = content as React.ReactElement<{ children: React.ReactNode | React.ReactNodeArray }>
-			if (_.isArray(fragment.props.children)) {
-				return Δ(fragment.props.children)
-			} else {
-				return Δ([fragment.props.children])
-			}
-		}
-
-		return [{ element: content }]
-	}
-
-	if (_.isPlainObject(content)) {
-		return _.toPairs(content)
-			.filter(([, element]) => React.isValidElement(element))
-			.map(([caption, element]) => ({ caption, element }))
-	}
-
-	return []
-}
-
-function Δ(elements: React.ReactNodeArray) {
-	return elements.filter(React.isValidElement).map(element => ({ element }))
+	return <React.Fragment>{elements}</React.Fragment>
 }
 
 // TODO: convert this to a React component
@@ -435,7 +321,7 @@ function getNodeHTML(node: React.ReactNode): string {
 	}
 
 	if (typeof node === 'string' || typeof node === 'number') {
-		return _.escape(String(node))
+		return escape(String(node))
 	}
 
 	if (Array.isArray(node)) {
@@ -443,28 +329,28 @@ function getNodeHTML(node: React.ReactNode): string {
 	}
 
 	if (React.isValidElement(node)) {
-		const tagName = `<span class="playbook__property__tag">${_.escape(getTagName(node))}</span>`
+		const tagName = `<span class="playbook__property__tag">${escape(getTagName(node))}</span>`
 		const { children, ...attributes } = node.props
 
-		let outerHTML = _.escape('<') + tagName
+		let outerHTML = escape('<') + tagName
 
-		outerHTML += _.map(attributes, (value, name) => {
+		outerHTML += Object.entries(attributes).map(([name, value]) => {
 			const openingQuote = typeof value === 'string' ? '' : '{'
 			const closingQuote = typeof value === 'string' ? '' : '}'
 			return (
-				`<div class="playbook__property__indent">${_.escape(name)}=${openingQuote}${getPropValueHTML(value, 'html')}${closingQuote}</div>`
+				`<div class="playbook__property__indent">${escape(name)}=${openingQuote}${getPropValueHTML(value, 'html')}${closingQuote}</div>`
 			)
 		}).join('')
 
 		const innerHTML = getNodeHTML(children)
 
 		if (innerHTML) {
-			outerHTML += _.escape('>') + '<div class="playbook__property__indent">' + innerHTML + '</div>' + _.escape('</') + tagName + _.escape('>')
+			outerHTML += escape('>') + '<div class="playbook__property__indent">' + innerHTML + '</div>' + escape('</') + tagName + escape('>')
 		} else {
-			outerHTML += _.escape('/>')
+			outerHTML += escape('/>')
 		}
 
-		return '<div class="playbook__property__indent">' + outerHTML + '</div>'
+		return outerHTML
 	}
 
 	console.warn('Found an unrecognized node type:', node)
@@ -481,9 +367,9 @@ function getTagName(element: React.ReactElement): string {
 	}
 
 	return (
-		_.get(element, 'type.displayName') ||
-		_.get(element, 'type.name') ||
-		_.get(element, 'type.constructor.name') ||
+		get(element, 'type.displayName') ||
+		get(element, 'type.name') ||
+		(get(element, 'type.constructor.name') === 'Function' && get(element, 'type.constructor.name')) ||
 		'Untitled'
 	)
 }
@@ -499,31 +385,33 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 	}
 
 	if (React.isValidElement(value)) {
-		return getNodeHTML(value)
+		return '<div class="playbook__property__indent">' + getNodeHTML(value) + '</div>'
 	}
 
-	if (_.isFunction(value)) {
+	if (typeof value === 'function') {
 		if (mode === 'text') {
 			return 'Function'
 		}
 
 		const list = String(value).split(/\r?\n/)
 		const indent = new RegExp(
-			'^' + (_.chain(list)
-				.map(line => line.replace(/\t/g, '  ').match(/^\s+/))
-				.compact()
-				.map(([match]) => match)
-				.minBy(match => match.length)
-				.value() || ''),
+			'^' + (
+				minBy(
+					compact(
+						list.map(line => get(line.replace(/\t/g, '  ').match(/^\s+/), 0))
+					),
+					match => match.length
+				) || ''
+			),
 		)
 		const text = list.map(line => line.replace(indent, '')).join('\n')
 
 		return '<span class="playbook__property__function" title="' +
-			_.escape(text) +
+			escape(text) +
 			'">Function</span>'
 	}
 
-	if (_.isArray(value)) {
+	if (Array.isArray(value)) {
 		const list: Array<string> = []
 		let lastRank = 0
 		let textLong = 0
@@ -545,18 +433,18 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 			list.push('<span title="' + hint.join(',\n') + '">...</span>')
 		}
 
-		const wrap = list.length > 1 || textLong > 120 ? addIndent : _.identity
+		const wrap = list.length > 1 || textLong > 120 ? addIndent : identity
 		return '[' + wrap(list.join(',' + lineFeed)) + ']'
 	}
 
-	if (_.isObject(value)) {
+	if (isObject(value)) {
 		const list: Array<string> = []
 		let lastRank = 0
 		let textLong = 0
-		const pairs = _.toPairs(value)
+		const pairs = Object.entries(value)
 		for (; lastRank < pairs.length; lastRank++) {
 			const [k, v] = pairs[lastRank]
-			const text = _.escape(k) + ': ' + getPropValueHTML(v, mode)
+			const text = escape(k) + ': ' + getPropValueHTML(v, mode)
 			if (textLong + text.length > 240 && mode === 'html') {
 				break
 			}
@@ -564,21 +452,21 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 			textLong += text.length
 		}
 
-		if (list.length < _.size(value)) {
+		if (list.length < Object.keys(value).length) {
 			const hint: Array<string> = []
 			for (; lastRank < pairs.length; lastRank++) {
 				const [k, v] = pairs[lastRank]
-				const text = _.escape(k) + ': ' + getPropValueHTML(v, 'text')
+				const text = escape(k) + ': ' + getPropValueHTML(v, 'text')
 				hint.push(text)
 			}
 			list.push('<span title="' + hint.join('\n') + '">...</span>')
 		}
 
-		const wrap = list.length > 1 || textLong > 120 ? addIndent : _.identity
+		const wrap = list.length > 1 || textLong > 120 ? addIndent : identity
 		return '{ ' + wrap(list.join(',' + lineFeed)) + ' }'
 	}
 
-	return _.escape(JSON.stringify(value, null, ''))
+	return escape(JSON.stringify(value, null, ''))
 }
 
 class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, { error?: any }> {
@@ -606,24 +494,22 @@ class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, {
 }
 
 function getQueryParams(): { [key: string]: string } {
-	return _.chain(window.location.search.replace(/^\?/, ''))
-		.split('&')
-		.compact()
-		.map(part => {
+	return Object.fromEntries(
+		compact(
+			window.location.search.replace(/^\?/, '')
+				.split('&')
+		).map(part => {
 			const [key, value] = part.split('=')
 			return [key, window.decodeURIComponent(value) ?? '']
 		})
-		.fromPairs()
-		.value()
+	)
 }
 
 function setQueryParams(params: { [key: string]: string | undefined }, replace: boolean) {
 	const link = '?' +
-		_.chain({ ...getQueryParams(), ...params })
-			.toPairs()
+		Object.entries({ ...getQueryParams(), ...params })
 			.filter((pair): pair is [string, string] => !!pair[1])
 			.map(([key, value]) => key + '=' + window.encodeURIComponent(value))
-			.value()
 			.join('&')
 
 	if (replace) {

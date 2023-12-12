@@ -8,7 +8,7 @@ Permission to use, copy, modify, and/or distribute this software for any purpose
 THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import _ from 'lodash'
+import get from 'lodash/get'
 
 export default class FuzzySearch<T> {
 	public options: {
@@ -21,17 +21,17 @@ export default class FuzzySearch<T> {
 		public keys: Array<string> = [],
 		options: Partial<{ caseSensitive: boolean, sort: boolean }> = {}
 	) {
-		this.options = _.assign({
+		this.options = Object.assign({
 			caseSensitive: false,
 			sort: false,
 		}, options)
 	}
 
 	search(query = ''): Array<T> {
-		query = _.trim(query)
+		query = query.trim()
 
 		if (!this.options.caseSensitive) {
-			query = _.toLower(query)
+			query = query.toLocaleLowerCase()
 		}
 
 		if (query === '') {
@@ -49,7 +49,7 @@ export default class FuzzySearch<T> {
 
 			} else {
 				for (const key of this.keys) {
-					const score = this.isMatch(String(_.get(item, key)), query)
+					const score = this.isMatch(String(get(item, key)), query)
 					if (score) {
 						results.push({ item, score })
 
