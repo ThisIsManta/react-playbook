@@ -5,12 +5,16 @@ import { repository } from './package.json'
 // See https://vitejs.dev/config/
 export default defineConfig({
 	root: 'src',
+
+	// Support GitHub Pages
+	base: repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
 	build: {
-		// Support GitHub Pages
-		assetsDir: repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
+		assetsDir: './',
 	},
+
 	server: {
 		open: true
 	},
+
 	plugins: [react()]
 })

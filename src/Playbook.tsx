@@ -160,7 +160,7 @@ function Index(props: Props) {
 		[searcher, searchText, selectPage],
 	)
 
-	const selectLink = selectPage ? '/?r=' + window.encodeURIComponent(selectPage.name) : null
+	const selectLink = selectPage ? './?r=' + window.encodeURIComponent(selectPage.name) : null
 
 	return (
 		<div className='playbook'>
