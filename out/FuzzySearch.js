@@ -1,17 +1,17 @@
-import _ from 'lodash';
+import get from 'lodash/get';
 export default class FuzzySearch {
     constructor(haystack = [], keys = [], options = {}) {
         this.haystack = haystack;
         this.keys = keys;
-        this.options = _.assign({
+        this.options = Object.assign({
             caseSensitive: false,
             sort: false,
         }, options);
     }
     search(query = '') {
-        query = _.trim(query);
+        query = query.trim();
         if (!this.options.caseSensitive) {
-            query = _.toLower(query);
+            query = query.toLocaleLowerCase();
         }
         if (query === '') {
             return this.haystack;
@@ -26,7 +26,7 @@ export default class FuzzySearch {
             }
             else {
                 for (const key of this.keys) {
-                    const score = this.isMatch(String(_.get(item, key)), query);
+                    const score = this.isMatch(String(get(item, key)), query);
                     if (score) {
                         results.push({ item, score });
                         break;

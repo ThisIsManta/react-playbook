@@ -9,19 +9,26 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import _ from 'lodash';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import get from 'lodash/get';
+import escape from 'lodash/escape';
+import isObject from 'lodash/isObject';
+import identity from 'lodash/identity';
+import compact from 'lodash/compact';
+import uniqBy from 'lodash/uniqBy';
+import sortBy from 'lodash/sortBy';
+import minBy from 'lodash/minBy';
 import FuzzySearch from './FuzzySearch';
 function classNames(...classes) {
     return classes.filter((item) => typeof item === 'string').map(item => item.trim()).join(' ');
 }
-const previewPathName = window.decodeURI(window.location.pathname.replace(/^\//, ''));
-if (!previewPathName) {
+const previewPageName = getQueryParams().r;
+if (!previewPageName) {
     document.body.classList.add('playbook__theater');
 }
 else {
     if (!document.title) {
-        document.title = previewPathName;
+        document.title = previewPageName;
     }
     if (window.parent !== window.self) {
         document.body.classList.add('playbook__preview');
@@ -32,34 +39,26 @@ if (darkMode) {
     document.body.classList.add('playbook__dark-mode');
 }
 const Playbook = function Playbook(props) {
-    const pages = useMemo(() => _.chain(props.pages)
-        .uniqBy(page => page.name)
-        .sortBy(page => page.name)
-        .value(), [props.pages]);
-    if (previewPathName) {
-        const page = _.find(pages, page => page.name === previewPathName);
-        if (!page) {
+    const pages = useMemo(() => sortBy(uniqBy(props.pages, page => page.name), page => page.name), [props.pages]);
+    if (previewPageName) {
+        const page = pages.find(page => page.name === previewPageName);
+        if (!page || typeof page.content !== 'function') {
             return null;
         }
-        const elements = getElements(page.content);
-        if (elements.length === 0) {
-            return null;
-        }
-        const index = parseInt(window.location.hash.replace(/^#/, '')) || 0;
-        const element = elements[index];
-        if (!element) {
-            return null;
-        }
+        const Content = page.content;
         const ContentWrapper = props.contentWrapper || PassThroughContentWrapper;
         return (React.createElement(ErrorBoundary, null,
-            React.createElement(ContentWrapper, null, element.element)));
+            React.createElement(ContentWrapper, null,
+                React.createElement(React.Suspense, null,
+                    React.createElement(Content, null)))));
     }
     return (React.createElement(ErrorBoundary, null,
         React.createElement(Index, Object.assign({}, props, { pages: pages }))));
 };
 Playbook.Button = Button;
+Playbook.Catalog = Catalog;
 function Index(props) {
-    const getSelectPage = useCallback(() => _.find(props.pages, page => page.name === getQueryParams()['p']), [props.pages]);
+    const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages]);
     const getSearchText = useCallback(() => getQueryParams()['q'] || '', []);
     const [selectPage, setSelectPage] = useState(getSelectPage);
     const [searchText, setSearchText] = useState(getSearchText);
@@ -86,15 +85,6 @@ function Index(props) {
     }, [searchText]);
     const searcher = useMemo(() => new FuzzySearch(props.pages, ['name'], { caseSensitive: false, sort: true }), [props.pages]);
     const [leftMenuVisible, setLeftMenuVisible] = useState(false);
-    const [propertyPanelVisible, setPropertyPanelVisible] = useState(() => { var _a; return Boolean((_a = window.sessionStorage.getItem('playbook__property-panel-visible')) !== null && _a !== void 0 ? _a : 'true'); });
-    useEffect(() => {
-        if (propertyPanelVisible) {
-            window.sessionStorage.setItem('playbook__property-panel-visible', 'true');
-        }
-        else {
-            window.sessionStorage.setItem('playbook__property-panel-visible', '');
-        }
-    }, [propertyPanelVisible]);
     const onMenuItemClick = useCallback((pageName) => {
         setSelectPage(props.pages.find(page => page.name === pageName));
         setQueryParams({ p: pageName }, false);
@@ -112,6 +102,7 @@ function Index(props) {
         }
         return results.map(page => (React.createElement(MenuItemMemoized, { key: page.name, name: page.name, selected: page.name === (selectPage === null || selectPage === void 0 ? void 0 : selectPage.name), onClick: onMenuItemClick })));
     }, [searcher, searchText, selectPage]);
+    const selectLink = selectPage ? '/?r=' + window.encodeURIComponent(selectPage.name) : null;
     return (React.createElement("div", { className: 'playbook' },
         React.createElement("link", { href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,600&family=Roboto+Mono:400,600&display=swap', rel: 'stylesheet' }),
         React.createElement("div", { className: classNames('playbook__left', leftMenuVisible && 'playbook__left-responsive'), tabIndex: -1, onKeyUp: e => {
@@ -154,11 +145,11 @@ function Index(props) {
                     React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: "24px", viewBox: "0 0 24 24", width: "24px" },
                         React.createElement("rect", { fill: "none", height: "24", width: "24" }),
                         React.createElement("path", { d: "M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z" }))),
-                React.createElement(Button, { id: 'playbook__property-panel-toggle', title: 'Toggle property panel', active: propertyPanelVisible, onClick: () => { setPropertyPanelVisible(value => !value); } },
+                selectLink && (React.createElement(Button, { title: 'Open in a new tab', onClick: () => { window.open(selectLink, '_blank'); } },
                     React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: "24px", viewBox: "0 0 24 24", width: "24px" },
-                        React.createElement("path", { d: "M0 0h24v24H0V0z", fill: "none" }),
-                        React.createElement("path", { d: "M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" })))),
-            React.createElement("div", { className: 'playbook__contents' }, selectPage && (React.createElement(ContentsMemoized, { page: selectPage, propertyPanelVisible: propertyPanelVisible }))))));
+                        React.createElement("rect", { fill: "none", height: "24", width: "24" }),
+                        React.createElement("polygon", { points: "21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" }))))),
+            selectLink && (React.createElement("iframe", { className: 'playbook__content-container', "data-playbook-content": true, src: selectLink, width: '100%', frameBorder: '0' })))));
 }
 const MenuItemMemoized = React.memo(MenuItem);
 function MenuItem(props) {
@@ -171,111 +162,54 @@ function MenuItem(props) {
             part,
             "/")))));
 }
-const ContentsMemoized = React.memo(Contents);
-function Contents(props) {
-    if (_.isFunction(props.page.content)) {
-        const Content = props.page.content;
-        return React.createElement(React.Suspense, null,
-            React.createElement(Content, null));
-    }
-    const elements = getElements(props.page.content);
-    if (elements.length === 0) {
-        return (React.createElement("div", { className: 'playbook__error' },
-            "Expected to render React elements, but found ",
-            _.isObjectLike(props.page.content) ? JSON.stringify(props.page.content) : String(props.page.content),
-            "."));
-    }
-    return (React.createElement(React.Fragment, null, elements.map(({ caption, element }, index) => (React.createElement(ContentWithCaption, { key: props.page.name + '#' + index, link: '/' + window.encodeURI(props.page.name) + '#' + index, caption: caption, element: element, propertyPanelVisible: props.propertyPanelVisible })))));
-}
 function PassThroughContentWrapper(props) {
     return props.children;
-}
-const minimumPropertyPanelHeight = 45;
-function ContentWithCaption(props) {
-    const propertyPanel = useRef(null);
-    return (React.createElement("div", null,
-        props.caption && React.createElement("header", { className: 'playbook__content-caption' },
-            React.createElement("svg", { className: 'playbook__content-caption__icon', xmlns: "http://www.w3.org/2000/svg", height: "24", viewBox: "0 -960 960 960", width: "24" },
-                React.createElement("path", { d: "M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" })),
-            props.caption),
-        React.createElement("div", { className: 'playbook__content-container' },
-            React.createElement("div", { className: 'playbook__content-preview' },
-                React.createElement("iframe", { "data-playbook-content": true, src: props.link, width: '100%', height: minimumPropertyPanelHeight + 'px', frameBorder: '0', scrolling: 'no', onLoad: (e) => {
-                        var _a, _b;
-                        const w = e.currentTarget.contentWindow;
-                        if (w) {
-                            const actualContentHeight = w.document.body.clientHeight;
-                            const expectedFrameHeight = actualContentHeight <= 40
-                                ? Math.round(window.innerHeight * 0.8)
-                                : w.document.documentElement.scrollHeight;
-                            const propertyPanelHeight = (_b = (_a = propertyPanel.current) === null || _a === void 0 ? void 0 : _a.clientHeight) !== null && _b !== void 0 ? _b : 0;
-                            e.currentTarget.style.height = Math.max(expectedFrameHeight, propertyPanelHeight) + 'px';
-                            e.currentTarget.setAttribute('scrolling', 'auto');
-                        }
-                    } }),
-                React.createElement(Button, { id: 'playbook__new-window', title: 'Open in a new tab', onClick: () => { window.open(props.link, '_blank'); } },
-                    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", height: "24px", viewBox: "0 0 24 24", width: "24px" },
-                        React.createElement("rect", { fill: "none", height: "24", width: "24" }),
-                        React.createElement("polygon", { points: "21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71" })))),
-            React.createElement("div", { className: classNames('playbook__property', !props.propertyPanelVisible && 'playbook__property__hidden'), ref: propertyPanel, dangerouslySetInnerHTML: { __html: getNodeHTML(props.element) } }))));
 }
 function Button(_a) {
     var { active } = _a, props = __rest(_a, ["active"]);
     return (React.createElement("button", Object.assign({}, props, { className: classNames('playbook__button', active && 'playbook__button__active', props.className) })));
 }
-export function getElements(content) {
-    if (_.isArray(content)) {
-        return Δ(content);
-    }
-    if (React.isValidElement(content)) {
-        if (content.type === React.Fragment) {
-            const fragment = content;
-            if (_.isArray(fragment.props.children)) {
-                return Δ(fragment.props.children);
-            }
-            else {
-                return Δ([fragment.props.children]);
-            }
-        }
-        return [{ element: content }];
-    }
-    if (_.isPlainObject(content)) {
-        return _.toPairs(content)
-            .filter(([, element]) => React.isValidElement(element))
-            .map(([caption, element]) => ({ caption, element }));
-    }
-    return [];
-}
-function Δ(elements) {
-    return elements.filter(React.isValidElement).map(element => ({ element }));
+function Catalog(props) {
+    const elements = React.Children.toArray(props.children).map((element, index) => {
+        var _a, _b;
+        return (React.createElement("section", { key: index, className: 'playbook__catalog' },
+            React.isValidElement(element) && /^\.\$/.test(element.key || '') && (React.createElement("header", { className: 'playbook__catalog__caption' },
+                React.createElement("svg", { className: 'playbook__catalog__caption__icon', xmlns: "http://www.w3.org/2000/svg", height: "24", viewBox: "0 -960 960 960", width: "24" },
+                    React.createElement("path", { d: "M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" })), (_b = (_a = element.key) === null || _a === void 0 ? void 0 : _a.match(/^\.\$(.+)/)) === null || _b === void 0 ? void 0 :
+                _b[1])),
+            React.createElement("div", { className: 'playbook__catalog__columns' },
+                React.createElement("div", { className: 'playbook__catalog__property', dangerouslySetInnerHTML: { __html: getNodeHTML(element) } }),
+                React.createElement("div", { className: 'playbook__catalog__content' }, element))));
+    });
+    return React.createElement(React.Fragment, null, elements);
 }
 function getNodeHTML(node) {
     if (!node || node === true) {
         return '';
     }
     if (typeof node === 'string' || typeof node === 'number') {
-        return _.escape(String(node));
+        return escape(String(node));
     }
     if (Array.isArray(node)) {
         return node.map(getNodeHTML).join('');
     }
     if (React.isValidElement(node)) {
-        const tagName = `<span class="playbook__property__tag">${_.escape(getTagName(node))}</span>`;
+        const tagName = `<span class="playbook__property__tag">${escape(getTagName(node))}</span>`;
         const _a = node.props, { children } = _a, attributes = __rest(_a, ["children"]);
-        let outerHTML = _.escape('<') + tagName;
-        outerHTML += _.map(attributes, (value, name) => {
+        let outerHTML = escape('<') + tagName;
+        outerHTML += Object.entries(attributes).map(([name, value]) => {
             const openingQuote = typeof value === 'string' ? '' : '{';
             const closingQuote = typeof value === 'string' ? '' : '}';
-            return (`<div class="playbook__property__indent">${_.escape(name)}=${openingQuote}${getPropValueHTML(value, 'html')}${closingQuote}</div>`);
+            return (`<div class="playbook__property__indent">${escape(name)}=${openingQuote}${getPropValueHTML(value, 'html')}${closingQuote}</div>`);
         }).join('');
         const innerHTML = getNodeHTML(children);
         if (innerHTML) {
-            outerHTML += _.escape('>') + '<div class="playbook__property__indent">' + innerHTML + '</div>' + _.escape('</') + tagName + _.escape('>');
+            outerHTML += escape('>') + '<div class="playbook__property__indent">' + innerHTML + '</div>' + escape('</') + tagName + escape('>');
         }
         else {
-            outerHTML += _.escape('/>');
+            outerHTML += escape('/>');
         }
-        return '<div class="playbook__property__indent">' + outerHTML + '</div>';
+        return outerHTML;
     }
     console.warn('Found an unrecognized node type:', node);
     return '';
@@ -287,9 +221,9 @@ function getTagName(element) {
     if (typeof element.type === 'string') {
         return element.type;
     }
-    return (_.get(element, 'type.displayName') ||
-        _.get(element, 'type.name') ||
-        _.get(element, 'type.constructor.name') ||
+    return (get(element, 'type.displayName') ||
+        get(element, 'type.name') ||
+        (get(element, 'type.constructor.name') === 'Function' && get(element, 'type.constructor.name')) ||
         'Untitled');
 }
 function getPropValueHTML(value, mode) {
@@ -301,25 +235,20 @@ function getPropValueHTML(value, mode) {
         return '\n' + text.split(/\r?\n/).map(line => '  ' + line).join('\n') + '\n';
     };
     if (React.isValidElement(value)) {
-        return getNodeHTML(value);
+        return '<div class="playbook__property__indent">' + getNodeHTML(value) + '</div>';
     }
-    if (_.isFunction(value)) {
+    if (typeof value === 'function') {
         if (mode === 'text') {
             return 'Function';
         }
         const list = String(value).split(/\r?\n/);
-        const indent = new RegExp('^' + (_.chain(list)
-            .map(line => line.replace(/\t/g, '  ').match(/^\s+/))
-            .compact()
-            .map(([match]) => match)
-            .minBy(match => match.length)
-            .value() || ''));
+        const indent = new RegExp('^' + (minBy(compact(list.map(line => get(line.replace(/\t/g, '  ').match(/^\s+/), 0))), match => match.length) || ''));
         const text = list.map(line => line.replace(indent, '')).join('\n');
         return '<span class="playbook__property__function" title="' +
-            _.escape(text) +
+            escape(text) +
             '">Function</span>';
     }
-    if (_.isArray(value)) {
+    if (Array.isArray(value)) {
         const list = [];
         let lastRank = 0;
         let textLong = 0;
@@ -339,36 +268,36 @@ function getPropValueHTML(value, mode) {
             }
             list.push('<span title="' + hint.join(',\n') + '">...</span>');
         }
-        const wrap = list.length > 1 || textLong > 120 ? addIndent : _.identity;
+        const wrap = list.length > 1 || textLong > 120 ? addIndent : identity;
         return '[' + wrap(list.join(',' + lineFeed)) + ']';
     }
-    if (_.isObject(value)) {
+    if (isObject(value)) {
         const list = [];
         let lastRank = 0;
         let textLong = 0;
-        const pairs = _.toPairs(value);
+        const pairs = Object.entries(value);
         for (; lastRank < pairs.length; lastRank++) {
             const [k, v] = pairs[lastRank];
-            const text = _.escape(k) + ': ' + getPropValueHTML(v, mode);
+            const text = escape(k) + ': ' + getPropValueHTML(v, mode);
             if (textLong + text.length > 240 && mode === 'html') {
                 break;
             }
             list.push(text);
             textLong += text.length;
         }
-        if (list.length < _.size(value)) {
+        if (list.length < Object.keys(value).length) {
             const hint = [];
             for (; lastRank < pairs.length; lastRank++) {
                 const [k, v] = pairs[lastRank];
-                const text = _.escape(k) + ': ' + getPropValueHTML(v, 'text');
+                const text = escape(k) + ': ' + getPropValueHTML(v, 'text');
                 hint.push(text);
             }
             list.push('<span title="' + hint.join('\n') + '">...</span>');
         }
-        const wrap = list.length > 1 || textLong > 120 ? addIndent : _.identity;
+        const wrap = list.length > 1 || textLong > 120 ? addIndent : identity;
         return '{ ' + wrap(list.join(',' + lineFeed)) + ' }';
     }
-    return _.escape(JSON.stringify(value, null, ''));
+    return escape(JSON.stringify(value, null, ''));
 }
 class ErrorBoundary extends React.PureComponent {
     constructor(props) {
@@ -386,24 +315,18 @@ class ErrorBoundary extends React.PureComponent {
     }
 }
 function getQueryParams() {
-    return _.chain(window.location.search.replace(/^\?/, ''))
-        .split('&')
-        .compact()
-        .map(part => {
+    return Object.fromEntries(compact(window.location.search.replace(/^\?/, '')
+        .split('&')).map(part => {
         var _a;
         const [key, value] = part.split('=');
         return [key, (_a = window.decodeURIComponent(value)) !== null && _a !== void 0 ? _a : ''];
-    })
-        .fromPairs()
-        .value();
+    }));
 }
 function setQueryParams(params, replace) {
     const link = '?' +
-        _.chain(Object.assign(Object.assign({}, getQueryParams()), params))
-            .toPairs()
+        Object.entries(Object.assign(Object.assign({}, getQueryParams()), params))
             .filter((pair) => !!pair[1])
             .map(([key, value]) => key + '=' + window.encodeURIComponent(value))
-            .value()
             .join('&');
     if (replace) {
         window.history.replaceState(null, '', link);
