@@ -5,6 +5,13 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.preview.outputs.page_url }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -14,8 +21,18 @@ jobs:
         with:
           node-version-file: package.json
           cache: npm
+          registry-url: 'https://registry.npmjs.org'
 
       - run: npm ci --ignore-scripts
+
+      - run: npx vite build --outDir=${{ runner.temp }}/site
+
+      - uses: actions/upload-pages-artifact@v2
+        with:
+          path: ${{ runner.temp }}/site
+
+      - uses: actions/deploy-pages@v3
+        id: preview
 
       - run: npx auto-npm-version
         env:
