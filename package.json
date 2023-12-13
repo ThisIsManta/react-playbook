@@ -1,6 +1,6 @@
 {
   "name": "@thisismanta/react-playbook",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "",
   "main": "out/index.js",
   "types": "out/index.d.ts",
