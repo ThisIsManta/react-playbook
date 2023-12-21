@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import Playbook from './Playbook'
-import './Playbook.less'
+import Catalog from './Catalog'
 
 createRoot(document.getElementById('root')!).render(
 	<Playbook
@@ -29,7 +29,7 @@ function ContentWrapper(props: { children: React.ReactElement }) {
 
 const LazyButtons = React.lazy(() => Promise.resolve({
 	default: () => (
-		<Playbook.Catalog>
+		<Catalog>
 			<Button>
 				Button
 			</Button>
@@ -39,7 +39,7 @@ const LazyButtons = React.lazy(() => Promise.resolve({
 			<div style={{ height: 2000, background: 'yellow' }}>
 				Very tall content
 			</div>
-		</Playbook.Catalog>
+		</Catalog>
 	)
 }))
 

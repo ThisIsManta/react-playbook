@@ -3,7 +3,6 @@
     "alwaysStrict": true,
     "esModuleInterop": true,
     "target": "ES6",
-    "outDir": "out",
     "lib": [
       "ESNext",
       "DOM"

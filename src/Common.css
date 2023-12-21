@@ -1,0 +1,19 @@
+:root {
+	--theme: white;
+	--panel: rgba(0, 0, 0, 0.04);
+	--text: rgba(0, 0, 0, 0.8);
+	--placeholder: rgba(0, 0, 0, 0.4);
+	--accent: #0336FF;
+	--font-family: Roboto, sans-serif;
+	--left-side-width: 260px;
+	--content-implicit-width: 400px;
+	--content-property-width: 260px;
+}
+
+.playbook__dark-mode {
+	--theme: black;
+	--panel: rgba(255, 255, 255, 0.1);
+	--text: rgba(255, 255, 255, 0.95);
+	--placeholder: rgba(255, 255, 255, 0.4);
+	--accent: #FFDE03;
+}

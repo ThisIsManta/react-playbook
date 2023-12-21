@@ -1,0 +1,63 @@
+@import './Common.css';
+
+.playbook__catalog {
+	background: var(--panel);
+}
+
+.playbook__catalog__caption {
+	padding: 10px 15px;
+	background: var(--panel);
+	font-family: Roboto, sans-serif;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1;
+}
+
+.playbook__catalog__caption__icon {
+	width: 14px;
+	height: 14px;
+	vertical-align: top;
+	margin-right: 2px;
+	fill: var(--text);
+	transform: translateY(2px) rotate(-90deg);
+}
+
+.playbook__catalog__columns {
+	flex: 1 1 auto;
+	display: flex;
+	border-bottom: 1px solid var(--panel);
+}
+
+.playbook__catalog__property {
+	flex: 0 0 var(--content-property-width);
+	box-sizing: border-box;
+	color: var(--text);
+	font-family: Roboto Mono, Consolas;
+	font-size: 12px;
+	word-break: break-word;
+	padding: 10px;
+	border-right: 1px solid var(--panel);
+}
+
+.playbook__catalog__content {
+	padding: 10px;
+	position: relative;
+	flex: 1 1 auto;
+	background: var(--theme);
+}
+
+.playbook__catalog__property__tag {
+	font-weight: 600;
+}
+
+.playbook__catalog__property__indent {
+	margin-left: 16px;
+
+	&:hover {
+		background: var(--panel);
+	}
+}
+
+.playbook__catalog__property__function {
+	font-style: italic;
+}

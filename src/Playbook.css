@@ -1,24 +1,4 @@
-@left-side-width: 260px;
-@content-implicit-width: 400px;
-@content-property-width: 260px;
-@content-z-index: 0;
-@font-family: Roboto, sans-serif;
-
-:root {
-  --theme: white;
-  --panel: fade(black, 4%);
-  --text: fade(black, 80%);
-  --placeholder: fade(black, 40%);
-  --accent: #0336FF;
-}
-
-.playbook__dark-mode {
-  --theme: black;
-  --panel: fade(white, 10%);
-  --text: fade(white, 95%);
-  --placeholder: fade(white, 40%);
-  --accent: #FFDE03;
-}
+@import './Common.css';
 
 body {
   margin: 0;
@@ -44,12 +24,12 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  font-family: @font-family;
+  font-family: var(--font-family);
   font-size: 14px;
 }
 
 .playbook__left {
-  width: @left-side-width;
+  width: var(--left-side-width);
   flex: 0 0 auto;
   transition: width 0.3s ease-out;
   background: var(--panel);
@@ -63,24 +43,24 @@ body {
 .playbook__search-box {
   position: relative;
 
-  @search-icon-dimension: 20px;
+  --search-icon-dimension: 20px;
 
   .playbook__search-icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     left: 10px;
-    height: @search-icon-dimension;
-    width: @search-icon-dimension;
+    height: var(--search-icon-dimension);
+    width: var(--search-icon-dimension);
     fill: var(--placeholder);
     pointer-events: none;
   }
 
   input {
     width: 100%;
-    padding: 16px 10px 16px (10px + @search-icon-dimension + 5px);
+    padding: 16px 10px 16px calc(10px + var(--search-icon-dimension) + 5px);
     box-sizing: border-box;
-    font-family: @font-family;
+    font-family: var(--font-family);
     font-size: inherit;
     font-weight: 500;
     border: none;
@@ -155,7 +135,7 @@ body {
 .playbook__button {
   appearance: none;
   color: var(--text);
-  fill: var(--text); // For <svg>
+  fill: var(--text); /* For <svg> */
   background: var(--theme);
   border: 1px solid var(--text);
   outline: none;
@@ -167,7 +147,7 @@ body {
 
   &:hover:not(.playbook__button__active) {
     color: var(--accent);
-    fill: var(--accent); // For <svg>
+    fill: var(--accent); /* For <svg> */
     border-color: var(--accent);
   }
 
@@ -182,14 +162,14 @@ body {
   &>svg {
     width: 18px;
     height: 18px;
-    display: block; // For <svg>
+    display: block;
   }
 }
 
 .playbook__button__active {
   background: var(--accent);
   color: var(--theme);
-  fill: var(--theme); // For <svg>
+  fill: var(--theme); /* For <svg> */
 }
 
 .playbook__content-container {
@@ -199,74 +179,12 @@ body {
   background: var(--theme);
 }
 
-.playbook__catalog {
-  background: var(--panel);
-}
-
-.playbook__catalog__caption {
-  padding: 10px 15px;
-  background: var(--panel);
-  font-family: @font-family;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-}
-
-.playbook__catalog__caption__icon {
-  width: 14px;
-  height: 14px;
-  vertical-align: top;
-  margin-right: 2px;
-  fill: var(--text);
-  transform: translateY(2px) rotate(-90deg);
-}
-
-.playbook__catalog__columns {
-  flex: 1 1 auto;
-  display: flex;
-  border-bottom: 1px solid var(--panel);
-}
-
-.playbook__catalog__property {
-  flex: 0 0 @content-property-width;
-  box-sizing: border-box;
-  color: var(--text);
-  font-family: Roboto Mono, Consolas;
-  font-size: 12px;
-  word-break: break-word;
-  padding: 10px;
-  border-right: 1px solid var(--panel);
-}
-
-.playbook__catalog__content {
-  padding: 10px;
-  position: relative;
-  flex: 1 1 auto;
-  background: var(--theme);
-}
-
-.playbook__property__tag {
-  font-weight: 600;
-}
-
-.playbook__property__indent {
-  margin-left: 16px;
-
-  &:hover {
-    background: var(--panel);
-  }
-}
-
-.playbook__property__function {
-  font-style: italic;
-}
-
 .playbook__error {
   display: inline-block;
   background: #F44336;
   color: white;
   padding: 10px;
-  font-family: @font-family;
+  font-family: var(--font-family);
   font-size: 14px;
 }
 
@@ -274,7 +192,7 @@ body {
   display: none;
 }
 
-@media (max-width: (@left-side-width + @content-implicit-width + @content-property-width)) {
+@media (max-width: calc(var(--left-side-width) + var(--content-implicit-width) + var(--content-property-width))) {
   #playbook__side-menu-toggle {
     display: inline-block;
   }
@@ -295,12 +213,6 @@ body {
     &.playbook__left-responsive {
       animation: playbook__slide-right 0.5s ease-out;
     }
-  }
-}
-
-@media (max-width: (@content-implicit-width + @content-property-width)) {
-  .playbook__property {
-    display: none;
   }
 }
 
