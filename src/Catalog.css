@@ -1,12 +1,9 @@
 @import './Common.css';
 
-.playbook__catalog {
-	background: var(--panel);
-}
-
 .playbook__catalog__caption {
 	padding: 10px 15px;
 	background: var(--panel);
+	color: var(--text);
 	font-family: Roboto, sans-serif;
 	font-size: 14px;
 	font-weight: 500;
@@ -31,19 +28,18 @@
 .playbook__catalog__property {
 	flex: 0 0 var(--content-property-width);
 	box-sizing: border-box;
+	background: var(--panel);
 	color: var(--text);
 	font-family: Roboto Mono, Consolas;
 	font-size: 12px;
 	word-break: break-word;
 	padding: 10px;
-	border-right: 1px solid var(--panel);
 }
 
 .playbook__catalog__content {
 	padding: 10px;
 	position: relative;
 	flex: 1 1 auto;
-	background: var(--theme);
 }
 
 .playbook__catalog__property__tag {
