@@ -192,7 +192,7 @@ body {
   display: none;
 }
 
-@media (max-width: calc(var(--left-side-width) + var(--content-implicit-width) + var(--content-property-width))) {
+@media (max-width: 1000px) {
   #playbook__side-menu-toggle {
     display: inline-block;
   }
