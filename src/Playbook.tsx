@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useEffect, useCallback, useLayoutEffect } from 'react'
 import compact from 'lodash/compact'
 import uniqBy from 'lodash/uniqBy'
 import sortBy from 'lodash/sortBy'
@@ -117,6 +117,13 @@ function Index(props: Props) {
 		setQueryParams({ q: searchText }, true)
 	}, [searchText])
 
+	useLayoutEffect(() => {
+		const top = parseFloat(window.sessionStorage.getItem('playbook__menu-scroll-top') || '0')
+		if (!isNaN(top)) {
+			document.querySelector('.playbook__menu')?.scroll({ top })
+		}
+	}, [])
+
 	const searcher = useMemo(
 		() => new FuzzySearch(props.pages, ['name'], { caseSensitive: false, sort: true }),
 		[props.pages],
@@ -191,7 +198,16 @@ function Index(props: Props) {
 						}}
 					/>
 				</div>
-				<div className='playbook__menu'>
+				<div
+					className='playbook__menu'
+					onScroll={(e) => {
+						if (e.currentTarget.scrollTop === 0) {
+							window.sessionStorage.removeItem('playbook__menu-scroll-top')
+						} else {
+							window.sessionStorage.setItem('playbook__menu-scroll-top', String(e.currentTarget.scrollTop))
+						}
+					}}
+				>
 					{menus}
 				</div>
 			</div>
