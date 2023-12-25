@@ -8,7 +8,10 @@ import minBy from 'lodash/minBy'
 
 import './Catalog.css'
 
-export default function Catalog(props: { children: Iterable<React.ReactElement | React.ReactElement[]> }) {
+export default function Catalog(props: {
+	children: Iterable<React.ReactElement | React.ReactElement[]>
+	style?: React.CSSProperties
+}) {
 	const elements = React.Children.toArray(props.children).map((element, index) => (
 		<section key={index} className='playbook__catalog'>
 			{React.isValidElement(element) && /^\.\$/.test(element.key || '') && (
@@ -22,7 +25,7 @@ export default function Catalog(props: { children: Iterable<React.ReactElement |
 					className='playbook__catalog__property'
 					dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }}
 				/>
-				<div className='playbook__catalog__content'>
+				<div className='playbook__catalog__content' style={props.style}>
 					{element}
 				</div>
 			</div>
