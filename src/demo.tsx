@@ -36,6 +36,7 @@ const LazyButtons = React.lazy(() => Promise.resolve({
 			<Button key="Disabled Button" disabled extra={<span>Something</span>}>
 				<em>Button</em> Beep
 			</Button>
+			{[1, 2, 3].map(i => <Button key={i}>Button {i}</Button>)}
 			<div style={{ height: 2000, background: 'yellow' }}>
 				Very tall content
 			</div>
