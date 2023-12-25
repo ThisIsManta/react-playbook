@@ -250,6 +250,10 @@ function Index(props: Props) {
 const MenuItemMemoized = React.memo(MenuItem)
 
 function MenuItem(props: { name: string, selected: boolean, onClick: (name: string) => void }) {
+	const chunks = props.name.split(/\\|\//)
+	const directories = chunks.slice(0, -1)
+	const lastName = chunks.at(-1)
+
 	return (
 		<a
 			className={classNames(
@@ -263,11 +267,12 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 				props.onClick(props.name)
 			}}
 		>
-			{props.name.split(/\\|\//).map((part, rank, list) => (
-				rank === list.length - 1
-					? <span key={rank} className='playbook__menu__item__last'>{part}</span>
-					: <span key={rank}>{part}/</span>
+			{directories.map((name, rank) => (
+				<React.Fragment key={rank}>
+					<span>{name}/</span><wbr />
+				</React.Fragment>
 			))}
+			<span className='playbook__menu__item__last'>{lastName}</span>
 		</a>
 	)
 }
