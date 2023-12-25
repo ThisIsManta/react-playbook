@@ -9,7 +9,7 @@ import minBy from 'lodash/minBy'
 import './Catalog.css'
 
 export default function Catalog(props: {
-	children: Iterable<React.ReactElement | React.ReactElement[]>
+	children: React.ReactElement | Iterable<React.ReactElement | React.ReactElement[]>
 	style?: React.CSSProperties
 }) {
 	const elements = React.Children.toArray(props.children).map((element, index) => (
