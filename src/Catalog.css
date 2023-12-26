@@ -23,7 +23,6 @@
 }
 
 .playbook__catalog__columns {
-	flex: 1 1 auto;
 	display: flex;
 }
 
@@ -48,7 +47,7 @@
 
 .playbook__catalog__content {
 	position: relative;
-	flex: 1 1 auto;
+	flex: 1 0 auto;
 }
 
 .playbook__catalog__property__tag {
