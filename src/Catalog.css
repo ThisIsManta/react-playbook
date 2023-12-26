@@ -1,9 +1,12 @@
 @import './Common.css';
 
+.playbook__catalog {
+	margin: 10px;
+}
+
 .playbook__catalog__caption {
-	padding: 10px 15px;
-	background: var(--panel);
-	color: var(--text);
+	padding: 5px 15px 10px 10px;
+	color: var(--accent);
 	font-family: Roboto, sans-serif;
 	font-size: 14px;
 	font-weight: 500;
@@ -15,29 +18,34 @@
 	height: 14px;
 	vertical-align: top;
 	margin-right: 2px;
-	fill: var(--text);
+	fill: var(--accent);
 	transform: translateY(2px) rotate(-90deg);
 }
 
 .playbook__catalog__columns {
 	flex: 1 1 auto;
 	display: flex;
-	border-bottom: 1px solid var(--panel);
 }
 
 .playbook__catalog__property {
 	flex: 0 0 var(--content-property-width);
 	box-sizing: border-box;
-	background: var(--panel);
+	background: var(--theme);
 	color: var(--text);
 	font-family: Roboto Mono, Consolas;
 	font-size: 12px;
 	word-break: break-word;
 	padding: 10px;
+	margin-right: 10px;
+	border-radius: 5px;
+	box-shadow: var(--shadow-default);
+
+	&:hover {
+		box-shadow: var(--shadow-hover);
+	}
 }
 
 .playbook__catalog__content {
-	padding: 10px;
 	position: relative;
 	flex: 1 1 auto;
 }
@@ -48,6 +56,7 @@
 
 .playbook__catalog__property__indent {
 	margin-left: 16px;
+	border-radius: 5px;
 
 	&:hover {
 		background: var(--panel);

@@ -8,11 +8,11 @@ createRoot(document.getElementById('root')!).render(
 	<Playbook
 		pages={[
 			{
-				name: 'button',
+				name: 'ui-kit/button',
 				content: () => <LazyButtons />
 			},
 			{
-				name: 'input',
+				name: 'ui-kit/input',
 				content: () => <input key="Single element" value="Plain input box" />
 			}
 		]}

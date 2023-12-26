@@ -1,5 +1,9 @@
 @import './Common.css';
 
+html {
+  height: auto !important; /* Prevent trimming the bottom margin of Catalog */
+}
+
 body {
   margin: 0;
 
@@ -25,14 +29,14 @@ body {
   height: 100vh;
   overflow: hidden;
   font-family: var(--font-family);
-  font-size: 14px;
+  font-size: var(--font-size);
 }
 
 .playbook__left {
   width: var(--left-side-width);
   flex: 0 0 auto;
   transition: width 0.3s ease-out;
-  background: var(--panel);
+  background: var(--theme);
   box-sizing: border-box;
   user-select: none;
   display: flex;
@@ -49,7 +53,7 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 10px;
+    left: 20px;
     height: var(--search-icon-dimension);
     width: var(--search-icon-dimension);
     fill: var(--placeholder);
@@ -57,16 +61,25 @@ body {
   }
 
   input {
-    width: 100%;
-    padding: 16px 10px 16px calc(10px + var(--search-icon-dimension) + 5px);
+    width: calc(100% - 20px);
+    margin: 11px 10px;
+    padding: 10px 15px 10px calc(10px + var(--search-icon-dimension) + 5px);
     box-sizing: border-box;
     font-family: var(--font-family);
     font-size: inherit;
     font-weight: 500;
+    line-height: calc(var(--font-size) + 2px);
     border: none;
+    border-radius: 5px;
     outline: none;
-    background: transparent;
+    background: var(--theme);
     color: var(--accent);
+    transition: box-shadow 0.3s ease-out;
+    box-shadow: var(--shadow-default);
+
+    &:hover {
+      box-shadow: var(--shadow-hover);
+    }
 
     &::placeholder {
       color: var(--placeholder);
@@ -90,13 +103,13 @@ body {
   padding-bottom: 10px;
   overflow-x: hidden;
   overflow-y: auto;
-  background: var(--panel);
 }
 
 .playbook__menu__item {
   display: block;
   padding: 5px 10px;
   color: var(--text);
+  font-weight: 300;
   text-decoration: none;
   word-break: break-word;
   outline: none;
@@ -120,12 +133,11 @@ body {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  background: var(--panel);
 }
 
 .playbook__toolbar {
   display: flex;
-  background: var(--panel);
+  background: var(--theme);
   align-items: center;
   box-sizing: border-box;
   padding: 10px;
@@ -137,18 +149,23 @@ body {
   color: var(--text);
   fill: var(--text); /* For <svg> */
   background: var(--theme);
-  border: 1px solid var(--text);
+  border: none;
+  border-radius: 5px;
   outline: none;
-  padding: 4px;
+  padding: 10px;
   min-height: 28px;
-  font-size: 14px;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  font-weight: 500;
   line-height: 1;
   box-sizing: border-box;
+  box-shadow: var(--shadow-default);
+  transition: box-shadow 0.3s ease-out, transform 0.2s ease-out;
 
   &:hover:not(.playbook__button__active) {
     color: var(--accent);
     fill: var(--accent); /* For <svg> */
-    border-color: var(--accent);
+    box-shadow: var(--shadow-hover);
   }
 
   &:focus {
@@ -156,7 +173,7 @@ body {
   }
 
   &:active {
-    transform: translateY(1px);
+    transform: translateY(2px);
   }
 
   &>svg {
@@ -181,7 +198,7 @@ body {
 
 .playbook__error {
   display: inline-block;
-  background: #F44336;
+  background: red;
   color: white;
   padding: 10px;
   font-family: var(--font-family);

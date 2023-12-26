@@ -1,19 +1,31 @@
 :root {
-	--theme: white;
-	--panel: rgba(106, 108, 110, 0.5);
-	--text: rgba(0, 0, 0, 0.8);
-	--placeholder: rgba(0, 0, 0, 0.4);
-	--accent: #0336FF;
 	--font-family: Roboto, sans-serif;
+	--font-size: 14px;
 	--left-side-width: 260px;
 	--content-implicit-width: 400px;
 	--content-property-width: 260px;
+
+	--theme: white;
+	--panel: rgba(0, 0, 0, 0.04);
+	--text: rgba(0, 0, 0, 0.8);
+	--placeholder: rgba(0, 0, 0, 0.4);
+	--accent: #0336FF;
+	--content: white;
+	--shadow-default: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+		rgba(17, 17, 26, 0.1) 0px 0px 8px;
+	--shadow-hover: rgba(17, 17, 26, 0.1) 0px 1px 0px,
+		rgba(17, 17, 26, 0.2) 0px 0px 8px;
 }
 
 .playbook__dark-mode {
 	--theme: black;
-	--panel: rgba(106, 108, 110, 0.5);
+	--panel: rgba(255, 255, 255, 0.1);
 	--text: rgba(255, 255, 255, 0.95);
 	--placeholder: rgba(255, 255, 255, 0.4);
 	--accent: #FFDE03;
+	--content: black;
+	--shadow-default: rgba(250, 250, 250, 0.05) 0px 1px 0px,
+		rgba(250, 250, 250, 0.25) 0px 0px 8px;
+	--shadow-hover: rgba(250, 250, 250, 0.1) 0px 1px 0px,
+		rgba(250, 250, 250, 0.5) 0px 0px 8px;
 }
