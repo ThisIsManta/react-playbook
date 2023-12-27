@@ -17,7 +17,7 @@ createRoot(document.getElementById('root')!).render(
 			}
 		]}
 		contentWrapper={ContentWrapper}
-		contentControl={<div>Place your custom controls here <Playbook.Button>Button</Playbook.Button></div>}
+		contentControl={() => <div>Place your custom controls here <Playbook.Button>Button</Playbook.Button></div>}
 	/>
 )
 

@@ -15,14 +15,14 @@ export interface IPlaybookPage {
 	content: () => React.ReactElement
 }
 
-type Props = {
-	pages: Array<IPlaybookPage>
-	contentControl?: React.ComponentType | React.ReactElement
-	contentWrapper?: React.ComponentType<{ children: React.ReactElement }>
+type Props<T extends IPlaybookPage> = {
+	pages: Array<T>
+	contentControl?: React.ComponentType<{ currentPage?: T }>
+	contentWrapper?: React.ComponentType<{ currentPage: T; children: React.ReactElement }>
 }
 
 interface IPlaybook {
-	(props: Props): React.ReactElement | null
+	<T extends IPlaybookPage>(props: Props<T>): React.ReactElement | null
 	Button: typeof Button
 }
 
@@ -46,7 +46,7 @@ if (darkMode) {
 	document.body.classList.add('playbook__dark-mode')
 }
 
-const Playbook: IPlaybook = function Playbook(props: Props) {
+const Playbook: IPlaybook = function Playbook(props) {
 	const pages = useMemo(
 		() => sortBy(
 			uniqBy(props.pages, page => page.name),
@@ -67,7 +67,7 @@ const Playbook: IPlaybook = function Playbook(props: Props) {
 
 		return (
 			<ErrorBoundary>
-				<ContentWrapper>
+				<ContentWrapper currentPage={page}>
 					<React.Suspense>
 						<Content />
 					</React.Suspense>
@@ -85,7 +85,7 @@ const Playbook: IPlaybook = function Playbook(props: Props) {
 
 Playbook.Button = Button
 
-function Index(props: Props) {
+function Index<T extends IPlaybookPage>(props: Props<T>) {
 	const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages])
 	const getSearchText = useCallback(() => getQueryParams()['q'] || '', [])
 
@@ -221,8 +221,8 @@ function Index(props: Props) {
 						</svg>
 					</Button>
 					{typeof props.contentControl === 'function'
-						? <props.contentControl />
-						: props.contentControl}
+						? <props.contentControl currentPage={selectPage} />
+						: null}
 					<div style={{ flex: '1 1 auto' }} />
 					<Button
 						title='Toggle dark mode'
