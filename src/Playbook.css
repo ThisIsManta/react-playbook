@@ -161,6 +161,7 @@ body {
   box-sizing: border-box;
   box-shadow: var(--shadow-default);
   transition: box-shadow 0.3s ease-out, transform 0.2s ease-out;
+  cursor: pointer;
 
   &:hover:not(.playbook__button__active) {
     color: var(--accent);
