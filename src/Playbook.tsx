@@ -118,10 +118,7 @@ function Index(props: Props) {
 	}, [searchText])
 
 	useLayoutEffect(() => {
-		const top = parseFloat(window.sessionStorage.getItem('playbook__menu-scroll-top') || '0')
-		if (!isNaN(top)) {
-			document.querySelector('.playbook__menu')?.scroll({ top })
-		}
+		document.querySelector('.playbook__menu__item.--select')?.scrollIntoView({ block: 'center' })
 	}, [])
 
 	const searcher = useMemo(
