@@ -145,6 +145,9 @@ body {
 }
 
 .playbook__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   appearance: none;
   color: var(--text);
   fill: var(--text); /* For <svg> */
