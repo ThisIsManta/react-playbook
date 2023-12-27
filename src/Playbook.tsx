@@ -287,7 +287,7 @@ function MenuItem(props: { name: string, selected: boolean, onClick: (name: stri
 		>
 			{directories.map((name, rank) => (
 				<React.Fragment key={rank}>
-					<span>{name}/</span><wbr />
+					{name + '/'}<wbr />
 				</React.Fragment>
 			))}
 			<span className='playbook__menu__item__last'>{lastName}</span>
