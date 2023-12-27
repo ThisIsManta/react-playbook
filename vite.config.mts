@@ -7,7 +7,7 @@ export default defineConfig({
 	root: 'src',
 
 	// Support GitHub Pages
-	base: repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
+	base: '/' + repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
 	build: {
 		assetsDir: './',
 	},
