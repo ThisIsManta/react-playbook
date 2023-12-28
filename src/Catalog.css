@@ -47,7 +47,7 @@
 
 .playbook__catalog__content {
 	position: relative;
-	flex: 1 0 auto;
+	flex: 1 1 auto;
 }
 
 .playbook__catalog__property__tag {
@@ -65,4 +65,30 @@
 
 .playbook__catalog__property__function {
 	font-style: italic;
+}
+
+.playbook__catalog__grid {
+	margin: 10px;
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+
+	.playbook__catalog {
+		margin: 0;
+		display: flex;
+
+		.playbook__catalog__caption {
+			display: none;
+		}
+
+		.playbook__catalog__columns {
+			flex-direction: column-reverse;
+		}
+
+		.playbook__catalog__property {
+			margin: 10px 0 0 0;
+			flex: 1 1 auto;
+		}
+	}
 }

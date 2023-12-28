@@ -14,6 +14,17 @@ createRoot(document.getElementById('root')!).render(
 			{
 				name: 'ui-kit/input',
 				content: () => <input key="Single element" value="Plain input box" />
+			},
+			{
+				name: 'ui-kit/icon',
+				content: () => (
+					<Catalog.Grid style={{ width: 100 }}>
+						<i>🍎</i>
+						<i>🍊</i>
+						<i>🍋</i>
+						<i>🍐</i>
+					</Catalog.Grid>
+				)
 			}
 		]}
 		contentWrapper={ContentWrapper}

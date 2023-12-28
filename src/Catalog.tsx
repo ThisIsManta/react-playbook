@@ -37,6 +37,19 @@ export default function Catalog(props: {
 	return <React.Fragment>{elements}</React.Fragment>
 }
 
+Catalog.Grid = function CatalogGrid(props: {
+	children: React.ReactElement | Iterable<React.ReactElement | React.ReactElement[]>
+	style?: React.CSSProperties
+}) {
+	return (
+		<div className='playbook__catalog__grid'>
+			<Catalog style={props.style}>
+				{props.children}
+			</Catalog>
+		</div>
+	)
+}
+
 function getNodeHTML(node: React.ReactNode): string {
 	if (!node || node === true) {
 		return ''
