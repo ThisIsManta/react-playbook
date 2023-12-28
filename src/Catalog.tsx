@@ -25,8 +25,10 @@ export default function Catalog(props: {
 					className='playbook__catalog__property'
 					dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }}
 				/>
-				<div className='playbook__catalog__content' style={props.style}>
-					{element}
+				<div className='playbook__catalog__content'>
+					<div style={props.style}>
+						{element}
+					</div>
 				</div>
 			</div>
 		</section>
