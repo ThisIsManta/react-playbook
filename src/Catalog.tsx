@@ -1,7 +1,7 @@
 import React from 'react'
 import get from 'lodash/get'
 import escape from 'lodash/escape'
-import isObject from 'lodash/isObject'
+import isPlainObject from 'lodash/isPlainObject'
 import identity from 'lodash/identity'
 import compact from 'lodash/compact'
 import minBy from 'lodash/minBy'
@@ -119,6 +119,7 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 		return '\n' + text.split(/\r?\n/).map(line => '  ' + line).join('\n') + '\n'
 	}
 
+	console.log('*** value »', value)
 	if (React.isValidElement(value)) {
 		return '<div class="playbook__catalog__property__indent">' + getNodeHTML(value) + '</div>'
 	}
@@ -172,7 +173,7 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 		return '[' + wrap(list.join(',' + lineFeed)) + ']'
 	}
 
-	if (isObject(value)) {
+	if (isPlainObject(value)) {
 		const list: Array<string> = []
 		let lastRank = 0
 		let textLong = 0
@@ -199,6 +200,10 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 
 		const wrap = list.length > 1 || textLong > 120 ? addIndent : identity
 		return '{ ' + wrap(list.join(',' + lineFeed)) + ' }'
+	}
+
+	if (value === undefined) {
+		return 'undefined'
 	}
 
 	return escape(JSON.stringify(value, null, ''))
