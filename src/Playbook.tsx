@@ -1,7 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useLayoutEffect } from 'react'
 import compact from 'lodash/compact'
-import uniqBy from 'lodash/uniqBy'
-import sortBy from 'lodash/sortBy'
 import FuzzySearch from './FuzzySearch'
 
 import './Playbook.css'
@@ -47,27 +45,20 @@ if (darkMode) {
 }
 
 const Playbook: IPlaybook = function Playbook(props) {
-	const pages = useMemo(
-		() => sortBy(
-			uniqBy(props.pages, page => page.name),
-			page => page.name),
-		[props.pages],
-	)
-
 	if (previewPageName) {
-		const page = pages.find(page => page.name === previewPageName)
+		const currentPage = props.pages.find(page => page.name === previewPageName)
 
-		if (!page || typeof page.content !== 'function') {
+		if (!currentPage || typeof currentPage.content !== 'function') {
 			// TODO: show not-found page
 			return null
 		}
 
-		const Content = page.content
+		const Content = currentPage.content
 		const ContentWrapper = props.contentWrapper || PassThroughContentWrapper
 
 		return (
 			<ErrorBoundary>
-				<ContentWrapper currentPage={page}>
+				<ContentWrapper currentPage={currentPage}>
 					<React.Suspense>
 						<Content />
 					</React.Suspense>
@@ -78,7 +69,7 @@ const Playbook: IPlaybook = function Playbook(props) {
 
 	return (
 		<ErrorBoundary>
-			<Index {...props} pages={pages} />
+			<Index {...props} pages={props.pages} />
 		</ErrorBoundary>
 	)
 }
