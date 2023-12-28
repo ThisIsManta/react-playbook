@@ -48,7 +48,7 @@ const LazyButtons = React.lazy(() => Promise.resolve({
 				<em>Button</em> Beep
 			</Button>
 			{[1, 2, 3].map(i => <Button key={i}>Button {i}</Button>)}
-			<div style={{ height: 2000, background: 'yellow' }}  data-dummy={undefined} data-null={null}>
+			<div style={{ height: 2000, background: 'yellow' }} data-date={new Date()} data-dummy={undefined} data-null={null}>
 				Very tall content
 			</div>
 		</Catalog>

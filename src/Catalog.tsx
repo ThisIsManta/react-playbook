@@ -202,6 +202,10 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 		return '{ ' + wrap(list.join(',' + lineFeed)) + ' }'
 	}
 
+	if (value instanceof Date) {
+		return `new Date("${value.toJSON()}")`
+	}
+
 	if (value === undefined) {
 		return 'undefined'
 	}
