@@ -119,7 +119,6 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 		return '\n' + text.split(/\r?\n/).map(line => '  ' + line).join('\n') + '\n'
 	}
 
-	console.log('*** value »', value)
 	if (React.isValidElement(value)) {
 		return '<div class="playbook__catalog__property__indent">' + getNodeHTML(value) + '</div>'
 	}
