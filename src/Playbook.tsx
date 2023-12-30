@@ -150,7 +150,7 @@ function Index<T extends IPlaybookPage>(props: Props<T>) {
 		[searcher, searchText, selectPage],
 	)
 
-	const selectLink = selectPage ? './?r=' + window.encodeURIComponent(selectPage.name) : null
+	const selectLink = selectPage ? window.location.pathname + '?r=' + window.encodeURIComponent(selectPage.name) : null
 
 	return (
 		<div className='playbook'>
