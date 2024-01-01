@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import get from 'lodash/get'
-import escape from 'lodash/escape'
 import isPlainObject from 'lodash/isPlainObject'
-import identity from 'lodash/identity'
 import compact from 'lodash/compact'
 import minBy from 'lodash/minBy'
+import sumBy from 'lodash/sumBy'
+import isNil from 'lodash/isNil'
 
 import './Catalog.css'
 
@@ -12,29 +12,40 @@ export default function Catalog(props: {
 	children: React.ReactElement | Iterable<React.ReactElement | React.ReactElement[]>
 	style?: React.CSSProperties
 }) {
-	const elements = React.Children.toArray(props.children).map((element, index) => (
-		<section key={index} className='playbook__catalog'>
-			{React.isValidElement(element) && /^\.\$/.test(element.key || '') && (
+	const elements = React.Children.toArray(props.children).map((element, index) =>
+		React.isValidElement(element) && (
+			<Element key={index} element={element} style={props.style} />
+		)
+	)
+
+	return <React.Fragment>{elements}</React.Fragment>
+}
+
+function Element(props: { element: React.ReactElement, style: React.CSSProperties | undefined }) {
+	const [overridingProps, setOverridingProps] = useState<any>({})
+
+	return (
+		<section className='playbook__catalog'>
+			{React.isValidElement(props.element) && /^\.\$/.test(props.element.key || '') && (
 				<header className='playbook__catalog__caption'>
 					<svg className='playbook__catalog__caption__icon' xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" /></svg>
-					{element.key?.match(/^\.\$(.+)/)?.[1]}
+					{props.element.key?.match(/^\.\$(.+)/)?.[1]}
 				</header>
 			)}
 			<div className='playbook__catalog__columns'>
-				<div
-					className='playbook__catalog__property'
-					dangerouslySetInnerHTML={{ __html: getNodeHTML(element) }}
-				/>
+				<div className='playbook__catalog__property'>
+					<ElementResolver setOverridingProps={setOverridingProps}>
+						{React.cloneElement(props.element, overridingProps)}
+					</ElementResolver>
+				</div>
 				<div className='playbook__catalog__content'>
 					<div style={props.style}>
-						{element}
+						{React.cloneElement(props.element, overridingProps)}
 					</div>
 				</div>
 			</div>
 		</section>
-	))
-
-	return <React.Fragment>{elements}</React.Fragment>
+	)
 }
 
 Catalog.Grid = function CatalogGrid(props: {
@@ -50,46 +61,253 @@ Catalog.Grid = function CatalogGrid(props: {
 	)
 }
 
-function getNodeHTML(node: React.ReactNode): string {
-	if (!node || node === true) {
-		return ''
+function ElementResolver(props: {
+	children: React.ReactNode
+	setOverridingProps?: (setter: ((props: object) => object)) => void
+}): React.ReactNode {
+	const setOverridingProps = props.setOverridingProps
+
+	if (!props.children || props.children === true) {
+		return null
 	}
 
-	if (typeof node === 'string' || typeof node === 'number') {
-		return escape(String(node))
-	}
-
-	if (Array.isArray(node)) {
-		return node.map(getNodeHTML).join('')
-	}
-
-	if (React.isValidElement(node)) {
-		const tagName = `<span class="playbook__catalog__property__tag">${escape(getTagName(node))}</span>`
-		const { children, ...attributes } = node.props
-
-		let outerHTML = escape('<') + tagName
-
-		outerHTML += Object.entries(attributes).map(([name, value]) => {
-			const openingQuote = typeof value === 'string' ? '' : '{'
-			const closingQuote = typeof value === 'string' ? '' : '}'
+	if (typeof props.children === 'string' || typeof props.children === 'number') {
+		if (setOverridingProps) {
 			return (
-				`<div class="playbook__catalog__property__indent">${escape(name)}=${openingQuote}${getPropValueHTML(value, 'html')}${closingQuote}</div>`
+				<span
+					className='playbook__catalog__property__interactive'
+					contentEditable
+					suppressContentEditableWarning
+					onBlur={(e) => {
+						setOverridingProps(otherProps => ({
+							...otherProps,
+							children: e.target.innerText
+						}))
+					}}
+				>
+					{String(props.children)}
+				</span>
 			)
-		}).join('')
-
-		const innerHTML = getNodeHTML(children)
-
-		if (innerHTML) {
-			outerHTML += escape('>') + '<div class="playbook__catalog__property__indent">' + innerHTML + '</div>' + escape('</') + tagName + escape('>')
-		} else {
-			outerHTML += escape('/>')
 		}
 
-		return outerHTML
+		return String(props.children)
 	}
 
-	console.warn('Found an unrecognized node type:', node)
-	return ''
+	if (Array.isArray(props.children)) {
+		return props.children.map((node, index) => (
+			<ElementResolver key={index}>
+				{node}
+			</ElementResolver>
+		))
+	}
+
+	if (React.isValidElement(props.children)) {
+		const tagName = <span className='playbook__catalog__property__tag'>{getTagName(props.children)}</span>
+
+		const { children, ...attributes } = props.children.props
+		const attributeElements = Object.entries(attributes).map(([name, value]) => {
+			const openingQuote = typeof value === 'string' ? '"' : '{'
+			const closingQuote = typeof value === 'string' ? '"' : '}'
+
+			const setOverridingValue = setOverridingProps ? (nextValue: any) => {
+				setOverridingProps((otherProps) => ({
+					...otherProps,
+					[name]: nextValue
+				}))
+			} : undefined
+
+			return (
+				<div
+					key={name}
+					className='playbook__catalog__property__indent'
+				>
+					{name}={openingQuote}
+					<ValueResolver setOverridingValue={setOverridingValue}>
+						{value}
+					</ValueResolver>
+					{closingQuote}
+				</div>
+			)
+		})
+
+		if (children) {
+			return (
+				<div>
+					{'<'}{tagName}{attributeElements.length === 0 ? '' : ' '}{attributeElements}{'>'}
+					<div className='playbook__catalog__property__indent'>
+						<ElementResolver setOverridingProps={setOverridingProps}>
+							{children}
+						</ElementResolver>
+					</div>
+					{'</'}{tagName}{'>'}
+				</div>
+			)
+		} else {
+			return <div>{'<'}{tagName}{' '}{attributeElements}{'/>'}</div>
+		}
+	}
+
+	return null
+}
+
+function ValueResolver(props: {
+	children: any
+	setOverridingValue?: (value: any) => void
+}): React.ReactNode {
+	const setOverridingValue = props.setOverridingValue
+
+	if (React.isValidElement(props.children)) {
+		return (
+			<div className='playbook__catalog__property__indent'>
+				<ElementResolver>{props.children}</ElementResolver>
+			</div>
+		)
+	}
+
+	if (typeof props.children === 'boolean') {
+		const text = String(props.children)
+
+		if (setOverridingValue) {
+			return (
+				<span
+					className='playbook__catalog__property__interactive'
+					onClick={() => {
+						setOverridingValue(!props.children)
+					}}
+				>
+					{text}
+				</span>
+			)
+		}
+
+		return text
+	}
+
+	if (typeof props.children === 'string' || typeof props.children === 'number') {
+		const text = String(props.children)
+
+		if (setOverridingValue) {
+			return (
+				<span
+					className='playbook__catalog__property__interactive'
+					contentEditable
+					suppressContentEditableWarning
+					onBlur={(e) => {
+						if (typeof props.children === 'number') {
+							const nextValue = Number(e.target.innerText)
+							if (isNaN(nextValue)) {
+								setOverridingValue(e.target.innerText)
+							} else {
+								setOverridingValue(nextValue)
+							}
+						} else {
+							setOverridingValue(e.target.innerText)
+						}
+					}}
+				>
+					{text}
+				</span>
+			)
+		}
+
+		return text
+	}
+
+	if (props.children instanceof Date) {
+		if (setOverridingValue) {
+			return (
+				<span>
+					new Date("
+					<span
+						className='playbook__catalog__property__interactive'
+						contentEditable
+						suppressContentEditableWarning
+						onBlur={(e) => {
+							setOverridingValue(new Date(e.target.innerText))
+						}}
+					>
+						{props.children.toJSON()}
+					</span>
+					")
+				</span>
+			)
+		}
+
+		return getContentText(props.children)
+	}
+
+	if (typeof props.children === 'function') {
+		return (
+			<span
+				className='playbook__catalog__property__function'
+				title={getContentText(props.children)}
+			>
+				function
+			</span>
+		)
+	}
+
+	if (Array.isArray(props.children)) {
+		const list: Array<React.ReactElement> = []
+		let lastRank = 0
+		let textLong = 0
+		for (; lastRank < props.children.length; lastRank++) {
+			const text = getContentText(props.children[lastRank])
+			if (textLong + text.length > 240) {
+				break
+			}
+			list.push(<ValueResolver key={lastRank}>{props.children[lastRank]}</ValueResolver>)
+			textLong += text.length
+		}
+
+		if (list.length < props.children.length) {
+			const hint: Array<string> = []
+			for (; lastRank < props.children.length; lastRank++) {
+				const text = getContentText(props.children[lastRank])
+				hint.push(text)
+			}
+			list.push(<span key={lastRank} title={hint.join(',\n')}>...</span>)
+		}
+
+		if (textLong > 80) {
+			return <span>[{wrapLine(list)}]</span>
+		} else {
+			return <span>[{wrapItem(list)}]</span>
+		}
+	}
+
+	if (isPlainObject(props.children)) {
+		const list: Array<React.ReactElement> = []
+		let lastRank = 0
+		let textLong = 0
+		const pairs = Object.entries(props.children)
+		for (; lastRank < pairs.length; lastRank++) {
+			const [key, value] = pairs[lastRank]
+			const text = key + ': ' + getContentText(value)
+			if (textLong + text.length > 240) {
+				break
+			}
+			list.push(<span key={key}>{key}: <ValueResolver>{value}</ValueResolver></span>)
+			textLong += text.length
+		}
+
+		if (list.length < Object.keys(props.children).length) {
+			const hint: Array<string> = []
+			for (; lastRank < pairs.length; lastRank++) {
+				const [k, v] = pairs[lastRank]
+				hint.push(k + ': ' + getContentText(v))
+			}
+			list.push(<span key={lastRank} title={hint.join('\n')}>...</span>)
+		}
+
+		if (textLong > 80) {
+			return <span>{'{'}{wrapLine(list)}{'}'}</span>
+		} else {
+			return <span>{'{ '}{wrapItem(list)}{' }'}</span>
+		}
+	}
+
+	return getContentText(props.children)
 }
 
 function getTagName(element: React.ReactElement): string {
@@ -109,96 +327,57 @@ function getTagName(element: React.ReactElement): string {
 	)
 }
 
-function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
-	const lineFeed = mode === 'html' ? '<br/>' : '\n'
-	const addIndent = (text: string) => {
-		if (mode === 'html') {
-			return '<div class="playbook__catalog__property__indent">' + text + '</div>'
-		}
+function getContentText(value: any): string {
+	if (React.isValidElement<any>(value)) {
+		const { children, ...attributes } = value.props
+		const attributeText = Object.entries(attributes)
+			.map(([name, value]) => {
+				const openingQuote = typeof value === 'string' ? '' : '{'
+				const closingQuote = typeof value === 'string' ? '' : '}'
+				return `${name}=${openingQuote}${getContentText(value)}${closingQuote}`
+			}).map(line => '  ' + line.split(/\r?\n/).map(line => '  ' + line).join('\n') + '\n').join('')
 
-		return '\n' + text.split(/\r?\n/).map(line => '  ' + line).join('\n') + '\n'
-	}
-
-	if (React.isValidElement(value)) {
-		return '<div class="playbook__catalog__property__indent">' + getNodeHTML(value) + '</div>'
+		return '<' + getTagName(value) +
+			(attributeText ? '\n' + attributeText : '') +
+			(isNil(children) ? '/' : ('>' + getContentText(children) + '<' + getTagName(value))) +
+			'>'
 	}
 
 	if (typeof value === 'function') {
-		if (mode === 'text') {
-			return 'Function'
-		}
-
-		const list = String(value).split(/\r?\n/)
+		const lines = String(value).split(/\r?\n/)
 		const indent = new RegExp(
 			'^' + (
 				minBy(
 					compact(
-						list.map(line => get(line.replace(/\t/g, '  ').match(/^\s+/), 0))
+						lines.map(line => get(line.replace(/\t/g, '  ').match(/^\s+/), 0))
 					),
 					match => match.length
 				) || ''
 			),
 		)
-		const text = list.map(line => line.replace(indent, '')).join('\n')
-
-		return '<span class="playbook__catalog__property__function" title="' +
-			escape(text) +
-			'">Function</span>'
+		return lines.map(line => line.replace(indent, '')).join('\n')
 	}
 
 	if (Array.isArray(value)) {
-		const list: Array<string> = []
-		let lastRank = 0
-		let textLong = 0
-		for (; lastRank < value.length; lastRank++) {
-			const text = getPropValueHTML(value[lastRank], mode)
-			if (textLong + text.length > 240 && mode === 'html') {
-				break
-			}
-			list.push(text)
-			textLong += text.length
+		const items = value.map(getContentText)
+		const length = sumBy(items, item => item.length)
+		if (length > 80) {
+			return '[\n' + items.map(item => '  ' + item.split(/\r?\n/).map(line => '  ' + line).join('\n') + ',').join('\n') + '\n]'
+		} else {
+			return '[' + items.join(', ') + ']'
 		}
-
-		if (list.length < value.length) {
-			const hint: Array<string> = []
-			for (; lastRank < value.length; lastRank++) {
-				const text = getPropValueHTML(value[lastRank], 'text')
-				hint.push(text)
-			}
-			list.push('<span title="' + hint.join(',\n') + '">...</span>')
-		}
-
-		const wrap = list.length > 1 || textLong > 120 ? addIndent : identity
-		return '[' + wrap(list.join(',' + lineFeed)) + ']'
 	}
 
 	if (isPlainObject(value)) {
-		const list: Array<string> = []
-		let lastRank = 0
-		let textLong = 0
-		const pairs = Object.entries(value)
-		for (; lastRank < pairs.length; lastRank++) {
-			const [k, v] = pairs[lastRank]
-			const text = escape(k) + ': ' + getPropValueHTML(v, mode)
-			if (textLong + text.length > 240 && mode === 'html') {
-				break
-			}
-			list.push(text)
-			textLong += text.length
+		const items = Object.entries(value).map(([key, value]) => {
+			return key + ': ' + getContentText(value)
+		})
+		const length = sumBy(items, item => item.length)
+		if (length > 80) {
+			return '{\n' + items.map(item => '  ' + item.split(/\r?\n/).map(line => '  ' + line).join('\n') + ',').join('\n') + '\n}'
+		} else {
+			return '{ ' + items.join(', ') + ' }'
 		}
-
-		if (list.length < Object.keys(value).length) {
-			const hint: Array<string> = []
-			for (; lastRank < pairs.length; lastRank++) {
-				const [k, v] = pairs[lastRank]
-				const text = escape(k) + ': ' + getPropValueHTML(v, 'text')
-				hint.push(text)
-			}
-			list.push('<span title="' + hint.join('\n') + '">...</span>')
-		}
-
-		const wrap = list.length > 1 || textLong > 120 ? addIndent : identity
-		return '{ ' + wrap(list.join(',' + lineFeed)) + ' }'
 	}
 
 	if (value instanceof Date) {
@@ -209,5 +388,29 @@ function getPropValueHTML(value: any, mode: 'html' | 'text'): string {
 		return 'undefined'
 	}
 
-	return escape(JSON.stringify(value, null, ''))
+	return JSON.stringify(value, null, '')
+}
+
+function wrapLine(values: Array<React.ReactElement>) {
+	return (
+		<div className='playbook__catalog__property__indent'>
+			{values.map((value, index) => (
+				<React.Fragment key={index}>
+					{value},{(index < values.length - 1) && <br />}
+				</React.Fragment>
+			))}
+		</div>
+	)
+}
+
+function wrapItem(values: Array<React.ReactElement>) {
+	return (
+		<React.Fragment>
+			{values.map((value, index) => (
+				<React.Fragment key={index}>
+					{value}{(index < values.length - 1) && ', '}
+				</React.Fragment>
+			))}
+		</React.Fragment>
+	)
 }

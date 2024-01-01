@@ -63,6 +63,12 @@
 	}
 }
 
+.playbook__catalog__property__interactive {
+	&:hover, &:focus {
+		color: var(--accent);
+	}
+}
+
 .playbook__catalog__property__function {
 	font-style: italic;
 }

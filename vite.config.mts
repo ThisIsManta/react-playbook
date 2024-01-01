@@ -10,6 +10,7 @@ export default defineConfig({
 	base: '/' + repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
 	build: {
 		assetsDir: './',
+		minify: false,
 	},
 
 	server: {
