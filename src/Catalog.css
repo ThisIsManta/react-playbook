@@ -64,13 +64,33 @@
 }
 
 .playbook__catalog__property__interactive {
-	&:hover, &:focus {
+
+	&:hover,
+	&:focus {
 		color: var(--accent);
 	}
 }
 
 .playbook__catalog__property__function {
 	font-style: italic;
+
+	&.--blink {
+		animation: blink 1s linear infinite;
+	}
+}
+
+@keyframes blink {
+	0% {
+		background: var(--attention);
+	}
+
+	50% {
+		background: transparent;
+	}
+
+	100% {
+		background: var(--attention);
+	}
 }
 
 .playbook__catalog__grid {

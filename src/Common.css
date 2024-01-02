@@ -10,6 +10,7 @@
 	--text: rgba(0, 0, 0, 0.8);
 	--placeholder: rgba(0, 0, 0, 0.4);
 	--accent: #0336FF;
+	--attention: #FF6D00;
 	--content: white;
 	--shadow-default: rgba(17, 17, 26, 0.05) 0px 1px 0px,
 		rgba(17, 17, 26, 0.1) 0px 0px 8px;

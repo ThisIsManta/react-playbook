@@ -18,8 +18,8 @@ createRoot(document.getElementById('root')!).render(
 						<button
 							key="caption goes here"
 							title="tooltip"
-							disabled
-							onClick={() => { alert('onClick') }}
+							disabled={false}
+							onClick={(e) => { console.log('onClick', e) }}
 							data-element={<span title="something">Something</span>}
 							data-string="String"
 							data-number={1}

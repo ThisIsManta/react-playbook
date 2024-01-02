@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState, useRef, useContext } from 'react'
 import get from 'lodash/get'
 import isPlainObject from 'lodash/isPlainObject'
 import compact from 'lodash/compact'
 import minBy from 'lodash/minBy'
 import sumBy from 'lodash/sumBy'
 import isNil from 'lodash/isNil'
+import classNames from './classNames'
 
 import './Catalog.css'
 
@@ -14,19 +15,69 @@ export default function Catalog(props: {
 }) {
 	const elements = React.Children.toArray(props.children).map((element, index) =>
 		React.isValidElement(element) && (
-			<Element key={index} element={element} style={props.style} />
+			<Entry key={index} element={element} style={props.style} />
 		)
 	)
 
 	return <React.Fragment>{elements}</React.Fragment>
 }
 
-function Element(props: { element: React.ReactElement, style: React.CSSProperties | undefined }) {
-	const [overridingProps, setOverridingProps] = useState<any>({})
+const BlinkTrackerContext = React.createContext(new Map<Function, number>())
+
+function Entry(props: { element: React.ReactElement, style: React.CSSProperties | undefined }) {
+	const [overridingProps, setOverridingProps] = useState<Record<string, any>>({})
+
+	const [blinkTracker, setBlinkTracker] = useState(new Map<Function, number>())
+	const blinkTrackerRef = useRef(new Map<Function, number>())
+
+	const blinkCallbacks = useMemo(() => {
+		return Object.fromEntries(compact(Object.entries(props.element.props).map(([name, originalCallback]) => {
+			if (typeof originalCallback !== 'function') {
+				return null
+			}
+
+			const wrapperCallback = (...args) => {
+				// Cancel on-going timer
+				if (blinkTrackerRef.current.has(originalCallback)) {
+					clearTimeout(blinkTrackerRef.current.get(originalCallback))
+				}
+
+				const timerID = setTimeout(() => {
+					// Stop blinking
+					setBlinkTracker(current => {
+						const copy = new Map(current)
+						copy.delete(wrapperCallback)
+						return copy
+					})
+				}, 3500)
+
+				// Start blinking
+				setBlinkTracker(current => {
+					const copy = new Map(current)
+					copy.set(wrapperCallback, timerID)
+					return copy
+				})
+
+				blinkTrackerRef.current.set(originalCallback, timerID)
+
+				return originalCallback(...args)
+			}
+
+			// Preserve the original function body
+			wrapperCallback.toString = () => originalCallback.toString()
+
+			return [name, wrapperCallback] as const
+		})))
+	}, [props.element])
+
+	const element = useMemo(
+		() => React.cloneElement(props.element, { ...overridingProps, ...blinkCallbacks }),
+		[props.element, overridingProps, blinkCallbacks]
+	)
 
 	return (
 		<section className='playbook__catalog'>
-			{React.isValidElement(props.element) && /^\.\$/.test(props.element.key || '') && (
+			{/^\.\$/.test(props.element.key || '') && (
 				<header className='playbook__catalog__caption'>
 					<svg className='playbook__catalog__caption__icon' xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M685-128v-418H329l146 146-74 74-273-273 273-273 74 74-146 146h462v524H685Z" /></svg>
 					{props.element.key?.match(/^\.\$(.+)/)?.[1]}
@@ -34,13 +85,15 @@ function Element(props: { element: React.ReactElement, style: React.CSSPropertie
 			)}
 			<div className='playbook__catalog__columns'>
 				<div className='playbook__catalog__property'>
-					<ElementResolver setOverridingProps={setOverridingProps}>
-						{React.cloneElement(props.element, overridingProps)}
-					</ElementResolver>
+					<BlinkTrackerContext.Provider value={blinkTracker}>
+						<ElementIntrospection setOverridingProps={setOverridingProps}>
+							{element}
+						</ElementIntrospection>
+					</BlinkTrackerContext.Provider>
 				</div>
 				<div className='playbook__catalog__content'>
 					<div style={props.style}>
-						{React.cloneElement(props.element, overridingProps)}
+						{element}
 					</div>
 				</div>
 			</div>
@@ -61,7 +114,7 @@ Catalog.Grid = function CatalogGrid(props: {
 	)
 }
 
-function ElementResolver(props: {
+function ElementIntrospection(props: {
 	children: React.ReactNode
 	setOverridingProps?: (setter: ((props: object) => object)) => void
 }): React.ReactNode {
@@ -95,9 +148,9 @@ function ElementResolver(props: {
 
 	if (Array.isArray(props.children)) {
 		return props.children.map((node, index) => (
-			<ElementResolver key={index}>
+			<ElementIntrospection key={index}>
 				{node}
-			</ElementResolver>
+			</ElementIntrospection>
 		))
 	}
 
@@ -122,9 +175,9 @@ function ElementResolver(props: {
 					className='playbook__catalog__property__indent'
 				>
 					{name}={openingQuote}
-					<ValueResolver setOverridingValue={setOverridingValue}>
+					<ValueIntrospection setOverridingValue={setOverridingValue}>
 						{value}
-					</ValueResolver>
+					</ValueIntrospection>
 					{closingQuote}
 				</div>
 			)
@@ -135,9 +188,9 @@ function ElementResolver(props: {
 				<div>
 					{'<'}{tagName}{attributeElements.length === 0 ? '' : ' '}{attributeElements}{'>'}
 					<div className='playbook__catalog__property__indent'>
-						<ElementResolver setOverridingProps={setOverridingProps}>
+						<ElementIntrospection setOverridingProps={setOverridingProps}>
 							{children}
-						</ElementResolver>
+						</ElementIntrospection>
 					</div>
 					{'</'}{tagName}{'>'}
 				</div>
@@ -150,16 +203,18 @@ function ElementResolver(props: {
 	return null
 }
 
-function ValueResolver(props: {
+function ValueIntrospection(props: {
 	children: any
 	setOverridingValue?: (value: any) => void
 }): React.ReactNode {
 	const setOverridingValue = props.setOverridingValue
 
+	const blinkCallbacks = useContext(BlinkTrackerContext)
+
 	if (React.isValidElement(props.children)) {
 		return (
 			<div className='playbook__catalog__property__indent'>
-				<ElementResolver>{props.children}</ElementResolver>
+				<ElementIntrospection>{props.children}</ElementIntrospection>
 			</div>
 		)
 	}
@@ -239,7 +294,7 @@ function ValueResolver(props: {
 	if (typeof props.children === 'function') {
 		return (
 			<span
-				className='playbook__catalog__property__function'
+				className={classNames('playbook__catalog__property__function', blinkCallbacks.has(props.children) && '--blink')}
 				title={getContentText(props.children)}
 			>
 				function
@@ -256,7 +311,7 @@ function ValueResolver(props: {
 			if (textLong + text.length > 240) {
 				break
 			}
-			list.push(<ValueResolver key={lastRank}>{props.children[lastRank]}</ValueResolver>)
+			list.push(<ValueIntrospection key={lastRank}>{props.children[lastRank]}</ValueIntrospection>)
 			textLong += text.length
 		}
 
@@ -287,7 +342,7 @@ function ValueResolver(props: {
 			if (textLong + text.length > 240) {
 				break
 			}
-			list.push(<span key={key}>{key}: <ValueResolver>{value}</ValueResolver></span>)
+			list.push(<span key={key}>{key}: <ValueIntrospection>{value}</ValueIntrospection></span>)
 			textLong += text.length
 		}
 
