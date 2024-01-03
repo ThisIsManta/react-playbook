@@ -11,13 +11,31 @@ export interface IPlaybookPage {
 }
 
 type Props<T extends IPlaybookPage> = {
+	/**
+	 * List of objects containing `name`, `content` and other user-defined fields.
+	 */
 	pages: Array<T>
+
+	/**
+	 * UI to be displayed at the top bar.
+	 */
 	contentControl?: React.ComponentType<{ currentPage?: T }>
+
+	/**
+	 * UI to wrap around `pages[].content`.
+	 */
 	contentWrapper?: React.ComponentType<{ currentPage: T; children: React.ReactElement }>
 }
 
+/**
+ * Playbook component-listing view.
+ */
 interface IPlaybook {
 	<T extends IPlaybookPage>(props: Props<T>): React.ReactElement | null
+
+	/**
+	 * Playbook-style button.
+	 */
 	Button: typeof Button
 }
 

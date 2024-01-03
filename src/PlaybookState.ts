@@ -10,6 +10,9 @@ declare global {
 
 window.__playbookState = new Map<string, any>()
 
+/**
+ * Broadcasts a named state change to `pages[].content`.
+ */
 export function setPlaybookState(name: string, value: any) {
 	window.__playbookState!.set(name, value)
 
@@ -18,6 +21,10 @@ export function setPlaybookState(name: string, value: any) {
 	}
 }
 
+/**
+ * Listens for the named state changes from `contentControl`.
+ * @returns the latest value of the given named state
+ */
 export function usePlaybookState<T = any>(name: string, defaultValue: T) {
 	const [value, setValue] = useState(defaultValue)
 

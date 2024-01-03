@@ -9,6 +9,11 @@ import classNames from './classNames'
 
 import './Catalog.css'
 
+/**
+ * Prop-introspection view rendering in top-to-bottom direction.
+ * 
+ * @see `Catalog.Grid`
+ */
 export default function Catalog(props: {
 	children: React.ReactElement | Iterable<React.ReactElement | React.ReactElement[]>
 	style?: React.CSSProperties
@@ -24,7 +29,10 @@ export default function Catalog(props: {
 
 const BlinkTrackerContext = React.createContext(new Map<Function, number>())
 
-function Entry(props: { element: React.ReactElement, style: React.CSSProperties | undefined }) {
+function Entry(props: {
+	element: React.ReactElement,
+	style: React.CSSProperties | undefined
+}) {
 	const [overridingProps, setOverridingProps] = useState<Record<string, any>>({})
 
 	const [blinkTracker, setBlinkTracker] = useState(new Map<Function, number>())
@@ -101,6 +109,9 @@ function Entry(props: { element: React.ReactElement, style: React.CSSProperties 
 	)
 }
 
+/**
+ * Prop-introspection view rendering in left-to-right direction.
+ */
 Catalog.Grid = function CatalogGrid(props: {
 	children: React.ReactElement | Iterable<React.ReactElement | React.ReactElement[]>
 	style?: React.CSSProperties

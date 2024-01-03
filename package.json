@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "start": "vite",
-    "build": "tsc --outDir ./ && cp ./src/*.css ./ && rm ./demo.js",
+    "build": "tsc --outDir ./ && cp ./src/*.css ./ && rm -r ./demo",
     "preversion": "npm run build",
     "version": "npm publish --access public"
   },

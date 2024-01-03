@@ -4,7 +4,7 @@ import { repository } from './package.json'
 
 // See https://vitejs.dev/config/
 export default defineConfig({
-	root: 'src',
+	root: 'src/demo',
 
 	// Support GitHub Pages
 	base: '/' + repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
