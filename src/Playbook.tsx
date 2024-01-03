@@ -92,7 +92,7 @@ const Playbook: IPlaybook = function Playbook(props) {
 
 Playbook.Button = Button
 
-function Index<T extends IPlaybookPage>(props: Props<T>) {
+export function Index<T extends IPlaybookPage>(props: Props<T>) {
 	const getSelectPage = useCallback(() => props.pages.find(page => page.name === getQueryParams()['p']), [props.pages])
 	const getSearchText = useCallback(() => getQueryParams()['q'] || '', [])
 
@@ -125,7 +125,10 @@ function Index<T extends IPlaybookPage>(props: Props<T>) {
 	}, [searchText])
 
 	useLayoutEffect(() => {
-		document.querySelector('.playbook__menu__item.--select')?.scrollIntoView({ block: 'center' })
+		const selectedMenuItem = document.querySelector('.playbook__menu__item.--select')
+		if (selectedMenuItem && 'scrollIntoView' in selectedMenuItem) {
+			selectedMenuItem.scrollIntoView({ block: 'center' })
+		}
 	}, [])
 
 	const searcher = useMemo(
@@ -271,7 +274,7 @@ function Index<T extends IPlaybookPage>(props: Props<T>) {
 
 const MenuItemMemoized = React.memo(MenuItem)
 
-function MenuItem(props: { name: string, selected: boolean, onClick: (name: string) => void }) {
+export function MenuItem(props: { name: string, selected: boolean, onClick: (name: string) => void }) {
 	const chunks = props.name.split(/\\|\//)
 	const directories = chunks.slice(0, -1)
 	const lastName = chunks.at(-1)

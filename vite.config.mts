@@ -17,5 +17,5 @@ export default defineConfig({
 		open: true
 	},
 
-	plugins: [react()]
+	plugins: [react()],
 })
