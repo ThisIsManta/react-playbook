@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback, useLayoutEffect } fro
 import compact from 'lodash/compact'
 import FuzzySearch from './FuzzySearch'
 import classNames from './classNames'
+import ErrorBoundary from './ErrorBoundary'
 
 import './Playbook.css'
 
@@ -309,30 +310,6 @@ function Button({ active, ...props }: React.DetailedHTMLProps<React.ButtonHTMLAt
 			className={classNames('playbook__button', active && 'playbook__button__active', props.className)}
 		/>
 	)
-}
-
-class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, { error?: any }> {
-	constructor(props) {
-		super(props)
-
-		this.state = {}
-	}
-
-	static getDerivedStateFromError(error) {
-		return { error }
-	}
-
-	render() {
-		if (this.state.error) {
-			return (
-				<div className='playbook__error'>
-					{String(this.state.error)}
-				</div>
-			)
-		}
-
-		return this.props.children
-	}
 }
 
 function getQueryParams(): { [key: string]: string } {

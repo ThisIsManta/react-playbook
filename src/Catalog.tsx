@@ -6,6 +6,7 @@ import minBy from 'lodash/minBy'
 import sumBy from 'lodash/sumBy'
 import isNil from 'lodash/isNil'
 import classNames from './classNames'
+import ErrorBoundary from './ErrorBoundary'
 
 import './Catalog.css'
 
@@ -20,7 +21,9 @@ export default function Catalog(props: {
 }) {
 	const elements = React.Children.toArray(props.children).map((element, index) =>
 		React.isValidElement(element) && (
-			<Entry key={index} element={element} style={props.style} />
+			<ErrorBoundary key={index}>
+				<Entry element={element} style={props.style} />
+			</ErrorBoundary>
 		)
 	)
 

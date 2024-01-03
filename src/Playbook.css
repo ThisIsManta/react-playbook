@@ -200,15 +200,6 @@ body {
   background: var(--theme);
 }
 
-.playbook__error {
-  display: inline-block;
-  background: red;
-  color: white;
-  padding: 10px;
-  font-family: var(--font-family);
-  font-size: 14px;
-}
-
 #playbook__side-menu-toggle {
   display: none;
 }
