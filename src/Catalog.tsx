@@ -60,7 +60,7 @@ function Entry(props: {
 						copy.delete(wrapperCallback)
 						return copy
 					})
-				}, 3500)
+				}, 1500)
 
 				// Start blinking
 				setBlinkTracker(current => {
