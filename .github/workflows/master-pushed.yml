@@ -25,13 +25,16 @@ jobs:
 
       - run: npm ci --ignore-scripts
 
-      - run: npx vite build --outDir=${{ runner.temp }}/site
+      - name: Build GitHub Pages
+        run: npm run build:pre -- --outDir=${{ runner.temp }}/site
 
-      - uses: actions/upload-pages-artifact@v2
+      - name: Upload GitHub Pages
+        uses: actions/upload-pages-artifact@v2
         with:
           path: ${{ runner.temp }}/site
 
-      - uses: actions/deploy-pages@v3
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v3
         id: preview
 
       - run: npx auto-npm-version
