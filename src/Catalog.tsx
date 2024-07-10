@@ -389,10 +389,14 @@ export function getTagName(element: React.ReactElement): string {
 	}
 
 	return (
-		get(element, 'type.displayName') ||
-		get(element, 'type.name') ||
-		(get(element, 'type.constructor.name') === 'Function' && get(element, 'type.constructor.name')) ||
-		'Untitled'
+		get(element.type, 'displayName') ||
+		get(element.type, 'name') ||
+		(
+			get(element.type, 'constructor.name') === 'Function'
+				? undefined
+				: get(element.type, 'constructor.name')
+		) ||
+		'Component'
 	)
 }
 
