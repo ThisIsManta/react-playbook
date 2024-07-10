@@ -5,7 +5,7 @@ import compact from 'lodash/compact'
 import minBy from 'lodash/minBy'
 import sumBy from 'lodash/sumBy'
 import isNil from 'lodash/isNil'
-import classNames from './classNames'
+import classNames from 'classnames'
 import ErrorBoundary from './ErrorBoundary'
 
 import './Catalog.css'
@@ -379,7 +379,7 @@ function ValueIntrospection(props: {
 	return getContentText(props.children)
 }
 
-function getTagName(element: React.ReactElement): string {
+export function getTagName(element: React.ReactElement): string {
 	if (element.type === React.Fragment) {
 		return 'Fragment'
 	}
