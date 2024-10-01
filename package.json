@@ -8,7 +8,7 @@
     "start": "vite",
     "build:pre": "vite build",
     "build:lib": "tsc --outDir ./ && cp ./src/*.css ./ && rm -r ./demo",
-    "test": "tsc --noEmit && vitest --no-watch",
+    "test": "tsc --noEmit && vitest run",
     "preversion": "npm run build:lib",
     "version": "npm publish --access public"
   },
@@ -30,27 +30,27 @@
   },
   "homepage": "https://github.com/ThisIsManta/react-playbook#readme",
   "devDependencies": {
-    "@testing-library/react": "^14.3.0",
-    "@thisismanta/semantic-version": "^8.0.1",
-    "@types/lodash": "^4.17.0",
-    "@types/react": "^18.2.74",
-    "@types/react-dom": "^18.2.24",
-    "@vitejs/plugin-react": "^4.2.1",
-    "happy-dom": "^14.7.1",
-    "lefthook": "^1.6.8",
+    "@testing-library/react": "^16.0.1",
+    "@thisismanta/semantic-version": "^9.1.0",
+    "@types/lodash": "^4.17.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "happy-dom": "^15.7.4",
+    "lefthook": "^1.7.18",
     "lodash": "^4.17.21",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "^5.4.4",
-    "vite": "^5.2.8",
-    "vitest": "^1.4.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "~5.4.4",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.1"
   },
   "peerDependencies": {
     "classnames": "^2.0.0",
     "lodash": "^4.17.0",
     "react": ">=16"
   },
-  "volta": {
-    "node": "20.11.1"
+  "engines": {
+    "node": "20"
   }
 }

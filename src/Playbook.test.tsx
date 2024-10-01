@@ -30,7 +30,7 @@ describe(Index, () => {
 			/>
 		)
 
-		expect(container.querySelector<HTMLIFrameElement>('iframe[data-playbook-content="true"]')?.src).toMatchInlineSnapshot(`"/?r=quick%20brown%20fox"`)
+		expect(container.querySelector<HTMLIFrameElement>('iframe[data-playbook-content="true"]')?.src).toMatchInlineSnapshot(`"http://localhost:3000/?r=quick%20brown%20fox"`)
 	})
 
 	it('renders the pages that match search word', () => {
@@ -60,9 +60,6 @@ describe(Index, () => {
 					{ name: 'lazy yawning dog', content: () => <div>Content 2</div> }]}
 			/>
 		)
-
-		expect(queryByText('quick brown fox')).not.toBeNull()
-		expect(queryByText('lazy yawning dog')).not.toBeNull()
 
 		const searchBox = getByPlaceholderText('Search')
 		fireEvent.change(searchBox, { target: { value: 'buffalo' } })

@@ -13,11 +13,11 @@ jobs:
       name: github-pages
       url: ${{ steps.preview.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version-file: package.json
           cache: npm
@@ -29,12 +29,12 @@ jobs:
         run: npm run build:pre -- --outDir=${{ runner.temp }}/site
 
       - name: Upload GitHub Pages
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ runner.temp }}/site
 
       - name: Deploy GitHub Pages
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
         id: preview
 
       - run: npx auto-npm-version
