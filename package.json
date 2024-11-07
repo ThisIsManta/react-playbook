@@ -32,23 +32,23 @@
   "devDependencies": {
     "@testing-library/react": "^16.0.1",
     "@thisismanta/semantic-version": "^9.1.0",
-    "@types/lodash": "^4.17.9",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.2",
-    "happy-dom": "^15.7.4",
-    "lefthook": "^1.7.18",
+    "@types/lodash": "^4.17.13",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "happy-dom": "^15.11.0",
+    "lefthook": "^1.8.2",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "typescript": "~5.4.4",
-    "vite": "^5.4.8",
-    "vitest": "^2.1.1"
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
   },
   "peerDependencies": {
-    "classnames": "^2.0.0",
-    "lodash": "^4.17.0",
-    "react": ">=16"
+    "classnames": "^2.5.1",
+    "lodash": "^4.17.21",
+    "react": ">=18.3.1"
   },
   "engines": {
     "node": "20"
