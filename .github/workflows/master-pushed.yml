@@ -26,7 +26,7 @@ jobs:
       - run: npm ci --ignore-scripts
 
       - name: Build GitHub Pages
-        run: npm run build:pre -- --outDir=${{ runner.temp }}/site
+        run: npm exec vite -- build ./web --outDir=${{ runner.temp }}/site
 
       - name: Upload GitHub Pages
         uses: actions/upload-pages-artifact@v3

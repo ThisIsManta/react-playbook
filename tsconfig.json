@@ -1,27 +1,23 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
-    "esModuleInterop": true,
-    "target": "ES6",
+    "target": "ES2020",
     "module": "NodeNext",
+    "alwaysStrict": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "jsx": "react",
     "lib": [
       "ESNext",
       "DOM"
     ],
+    "noEmit": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "pretty": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "downlevelIteration": true,
-    "jsx": "react",
-    "removeComments": true,
-    "declaration": true,
-    "sourceMap": false
-  },
-  "include": [
-    "src"
-  ]
+  }
 }

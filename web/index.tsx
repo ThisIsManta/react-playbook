@@ -1,8 +1,8 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 
-import Playbook from '../Playbook'
-import Catalog from '../Catalog'
+import Playbook from '../src/Playbook'
+import Catalog from '../src/Catalog'
 
 const root = createRoot(document.getElementById('root')!)
 

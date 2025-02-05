@@ -1,10 +1,7 @@
 {
-	"files.exclude": {
-		"tmp": true,
-	},
 	"search.exclude": {
 		"**/node_modules": true,
-		"out": true,
+		"lib": true,
 	},
 	"typescript.tsdk": "node_modules\\typescript\\lib"
 }

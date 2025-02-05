@@ -2,14 +2,18 @@
   "name": "@thisismanta/react-playbook",
   "version": "8.7.2",
   "description": "",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
+  },
   "scripts": {
-    "start": "vite",
-    "build:pre": "vite build",
-    "build:lib": "tsc --outDir ./ && cp ./src/*.css ./ && rm -r ./demo",
-    "test": "tsc --noEmit && vitest run",
-    "preversion": "npm run build:lib",
+    "start": "vite ./web",
+    "build": "rm -rf lib/* && tsc --project tsconfig.build.json && cp src/*.css lib",
+    "test": "tsc --noEmit && vitest src --no-watch --dom",
+    "preversion": "npm run build",
     "version": "npm publish --access public"
   },
   "repository": {

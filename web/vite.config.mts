@@ -1,13 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { repository } from './package.json'
+import packageJSON from '../package.json' with { type: 'json' }
 
-// See https://vitejs.dev/config/
 export default defineConfig({
-	root: 'src/demo',
-
 	// Support GitHub Pages
-	base: '/' + repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
+	base: '/' + packageJSON.repository.url.split('/').slice(-1)[0].replace(/\.git$/, ''),
 	build: {
 		assetsDir: './',
 		minify: false,
