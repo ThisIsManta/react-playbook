@@ -1,6 +1,6 @@
 **Playbook** is a UI library made for listing React components.
 
-![Demo](./src/demo/screenshot.png)
+![Screenshot](./web/screenshot.png)
 
 - Compatible with any web bundler since this is just a small React UI library.
 - Extensible using `contentWrapper` and `contentControl` props.
