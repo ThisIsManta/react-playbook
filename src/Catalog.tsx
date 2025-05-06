@@ -388,16 +388,24 @@ export function getTagName(element: React.ReactElement): string {
 		return element.type
 	}
 
-	return (
-		get(element.type, 'displayName') ||
-		get(element.type, 'name') ||
-		(
-			get(element.type, 'constructor.name') === 'Function'
-				? undefined
-				: get(element.type, 'constructor.name')
-		) ||
-		'Component'
-	)
+	const displayName = get(element.type, 'displayName')
+	if (displayName) {
+		return displayName
+	}
+
+	const functionName = get(element.type, 'name')
+	if (functionName === '__vite_ssr_export_default__') {
+		return 'Component'
+	} else if (functionName) {
+		return functionName
+	}
+
+	const className = get(element.type, 'constructor.name')
+	if (className && className !== 'Function') {
+		return className
+	}
+
+	return 'Component'
 }
 
 function getContentText(value: any): string {
