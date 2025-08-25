@@ -1,10 +1,5 @@
 import React, { useMemo, useState, useRef, useContext } from 'react'
-import get from 'lodash/get'
-import isPlainObject from 'lodash/isPlainObject'
-import compact from 'lodash/compact'
-import minBy from 'lodash/minBy'
-import sumBy from 'lodash/sumBy'
-import isNil from 'lodash/isNil'
+import { compact, get, isNil, isPlainObject, minBy, sumBy } from 'lodash'
 import classNames from 'classnames'
 import ErrorBoundary from './ErrorBoundary'
 
@@ -50,10 +45,10 @@ function Entry(props: {
 			const wrapperCallback = (...args) => {
 				// Cancel on-going timer
 				if (blinkTrackerRef.current.has(originalCallback)) {
-					clearTimeout(blinkTrackerRef.current.get(originalCallback))
+					window.clearTimeout(blinkTrackerRef.current.get(originalCallback))
 				}
 
-				const timerID = setTimeout(() => {
+				const timerID = window.setTimeout(() => {
 					// Stop blinking
 					setBlinkTracker(current => {
 						const copy = new Map(current)

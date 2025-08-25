@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useLayoutEffect } from 'react'
-import compact from 'lodash/compact'
+import { compact } from 'lodash'
 import FuzzySearch from './FuzzySearch'
 import classNames from 'classnames'
 import ErrorBoundary from './ErrorBoundary'
