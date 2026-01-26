@@ -13,11 +13,11 @@ jobs:
       name: github-pages
       url: ${{ steps.preview.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: package.json
           cache: npm
@@ -29,7 +29,7 @@ jobs:
         run: npm exec vite -- build ./web --outDir=${{ runner.temp }}/site
 
       - name: Upload GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ runner.temp }}/site
 
