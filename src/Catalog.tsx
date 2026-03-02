@@ -28,7 +28,7 @@ export default function Catalog(props: {
 const BlinkTrackerContext = React.createContext(new Map<Function, number>())
 
 function Entry(props: {
-	element: React.ReactElement,
+	element: React.ReactElement<any>,
 	style: React.CSSProperties | undefined
 }) {
 	const [overridingProps, setOverridingProps] = useState<Record<string, any>>({})
@@ -166,7 +166,7 @@ function ElementIntrospection(props: {
 	if (React.isValidElement(props.children)) {
 		const tagName = <span className='playbook__catalog__property__tag'>{getTagName(props.children)}</span>
 
-		const { children, ...attributes } = props.children.props
+		const { children, ...attributes } = props.children.props as any
 		const attributeElements = Object.entries(attributes).map(([name, value]) => {
 			const openingQuote = typeof value === 'string' ? '"' : '{'
 			const closingQuote = typeof value === 'string' ? '"' : '}'
