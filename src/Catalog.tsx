@@ -42,7 +42,7 @@ function Entry(props: {
 				return null
 			}
 
-			const wrapperCallback = (...args) => {
+			const wrapperCallback = (...args: any[]) => {
 				// Cancel on-going timer
 				if (blinkTrackerRef.current.has(originalCallback)) {
 					window.clearTimeout(blinkTrackerRef.current.get(originalCallback))

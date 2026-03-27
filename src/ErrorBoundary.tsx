@@ -1,13 +1,13 @@
 import React from 'react'
 
-export default class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, { error?: any }> {
-	constructor(props) {
+export default class ErrorBoundary extends React.PureComponent<{ children: React.ReactNode }, { error?: unknown }> {
+	constructor(props: any) {
 		super(props)
 
 		this.state = {}
 	}
 
-	static getDerivedStateFromError(error) {
+	static getDerivedStateFromError(error: unknown) {
 		return { error }
 	}
 
