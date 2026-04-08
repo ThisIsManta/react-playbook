@@ -20,8 +20,9 @@
     "start": "vite ./web",
     "build": "rm -rf lib/* && tsc --project tsconfig.build.json && cp src/*.css lib",
     "test": "tsc --noEmit && vitest src --dom",
-    "preversion": "npm run build",
-    "version": "npm publish --provenance --access public"
+    "preversion": "npm run test -- --no-watch",
+    "version": "npm run build",
+    "postversion": "npm publish --provenance --access public"
   },
   "keywords": [
     "react",
@@ -38,23 +39,23 @@
   "homepage": "https://github.com/ThisIsManta/react-playbook#readme",
   "devDependencies": {
     "@testing-library/react": "^16.3.2",
-    "@thisismanta/semantic-version": "^10.0.0",
+    "@thisismanta/semantic-version": "^11.2.0",
     "@types/lodash": "^4.17.24",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.2.0",
+    "@vitejs/plugin-react": "^6.0.1",
     "happy-dom": "^20.8.9",
-    "lefthook": "^2.1.4",
-    "lodash": "^4.17.23",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "lefthook": "^2.1.5",
+    "lodash": "^4.18.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "typescript": "^6.0.2",
-    "vite": "^8.0.3",
-    "vitest": "^4.1.2"
+    "vite": "^8.0.7",
+    "vitest": "^4.1.3"
   },
   "peerDependencies": {
     "classnames": "^2.5.1",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "react": "^18.3.1 || ^19.0.0"
   }
 }

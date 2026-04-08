@@ -23,7 +23,7 @@ jobs:
           cache: npm
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm ci --ignore-scripts
+      - run: npm install
 
       - name: Build GitHub Pages
         run: npm exec vite -- build ./web --outDir=${{ runner.temp }}/site
@@ -37,6 +37,6 @@ jobs:
         uses: actions/deploy-pages@v4
         id: preview
 
-      - run: npx auto-npm-version
+      - run: npx make-next-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
